@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaChevronDown,
@@ -12,10 +12,16 @@ import {
   FaVolumeMute,
   FaHeart,
   FaRegHeart,
+  FaPlus,
 } from "react-icons/fa";
 import { useMusic } from "../../context/MusicContext";
 import { useAuth } from "../../context/AuthContext";
-import { toggleLikeSong, getLikedSongs } from "../../services/api";
+import { 
+  toggleLikeSong, 
+  getLikedSongs, 
+  getUserPlaylists, 
+  addSongToPlaylist 
+} from "../../services/api";
 import "./NowPlaying.css";
 
 const formatTime = (secs) => {
@@ -49,13 +55,34 @@ const NowPlaying = () => {
   } = useMusic();
 
   const [likedIds, setLikedIds] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
+  const [playlistMessage, setPlaylistMessage] = useState("");
+  const dropdownRef = useRef(null);
 
+  // Fetch Liked Songs & User Playlists on mount
   useEffect(() => {
     if (!user) return;
+
     getLikedSongs()
       .then((res) => setLikedIds(res.data.map((s) => s._id)))
       .catch(() => {});
+
+    getUserPlaylists()
+      .then((res) => setPlaylists(res.data || []))
+      .catch(() => {});
   }, [user]);
+
+  // Handle clicking outside of playlist dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowPlaylistMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!currentSong) {
@@ -76,6 +103,20 @@ const NowPlaying = () => {
         ? prev.filter((id) => id !== currentSong._id)
         : [...prev, currentSong._id]
     );
+  };
+
+  const handleAddToPlaylist = async (playlistId) => {
+    try {
+      await addSongToPlaylist(playlistId, currentSong._id);
+      setPlaylistMessage("Added to playlist!");
+      setTimeout(() => {
+        setPlaylistMessage("");
+        setShowPlaylistMenu(false);
+      }, 1500);
+    } catch (err) {
+      setPlaylistMessage(err.response?.data?.message || "Failed to add");
+      setTimeout(() => setPlaylistMessage(""), 2000);
+    }
   };
 
   const upNext = queue
@@ -113,10 +154,80 @@ const NowPlaying = () => {
               <h1>{currentSong.title}</h1>
               <p>{currentSong.artist}</p>
             </div>
+
+            {/* Action Buttons: Like & Add To Playlist */}
             {user && (
-              <button className="np-like-btn" onClick={handleLike} aria-label="Like song">
-                {isLiked ? <FaHeart color="#ff4ecd" /> : <FaRegHeart color="#94a3b8" />}
-              </button>
+              <div className="np-actions-block" style={{ display: "flex", gap: "12px", position: "relative" }} ref={dropdownRef}>
+                <button className="np-like-btn" onClick={handleLike} aria-label="Like song">
+                  {isLiked ? <FaHeart color="#ff4ecd" /> : <FaRegHeart color="#94a3b8" />}
+                </button>
+
+                <button 
+                  className="np-like-btn" 
+                  onClick={() => setShowPlaylistMenu((prev) => !prev)} 
+                  aria-label="Add to Playlist"
+                  title="Add to Playlist"
+                >
+                  <FaPlus color="#94a3b8" />
+                </button>
+
+                {/* Playlist Dropdown */}
+                {showPlaylistMenu && (
+                  <div 
+                    className="np-playlist-dropdown"
+                    style={{
+                      position: "absolute",
+                      right: 0,
+                      top: "35px",
+                      background: "#18181b",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      borderRadius: "10px",
+                      padding: "8px",
+                      width: "180px",
+                      zIndex: 100,
+                      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.5)",
+                    }}
+                  >
+                    <div style={{ fontSize: "11px", color: "#a1a1aa", padding: "4px 8px", fontWeight: "600" }}>
+                      ADD TO PLAYLIST
+                    </div>
+                    <hr style={{ borderColor: "rgba(255, 255, 255, 0.1)", margin: "4px 0" }} />
+                    
+                    {playlistMessage ? (
+                      <div style={{ fontSize: "12px", color: "#ff4ecd", padding: "6px 8px", textAlign: "center" }}>
+                        {playlistMessage}
+                      </div>
+                    ) : playlists.length > 0 ? (
+                      playlists.map((pl) => (
+                        <button
+                          key={pl._id}
+                          onClick={() => handleAddToPlaylist(pl._id)}
+                          style={{
+                            width: "100%",
+                            textAlign: "left",
+                            background: "transparent",
+                            border: "none",
+                            color: "#e4e4e7",
+                            padding: "6px 8px",
+                            fontSize: "13px",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                          onMouseEnter={(e) => (e.target.style.background = "rgba(255, 78, 205, 0.2)")}
+                          onMouseLeave={(e) => (e.target.style.background = "transparent")}
+                        >
+                          {pl.name}
+                        </button>
+                      ))
+                    ) : (
+                      <div style={{ fontSize: "12px", color: "#71717a", padding: "6px 8px" }}>
+                        No playlists found
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

@@ -185,6 +185,92 @@
 }
 
 /* ==========================================
+   ACTIONS & PLAYLIST DROPDOWN STYLES
+========================================== */
+
+.np-actions-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.np-playlist-dropdown {
+  position: absolute;
+  right: 0;
+  top: 45px;
+  width: 200px;
+  background: rgba(18, 18, 24, 0.85) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 18px !important;
+  padding: 10px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+              0 0 15px rgba(139, 92, 246, 0.15) !important;
+  z-index: 1000 !important;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.np-dropdown-header {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #a1a1aa;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.np-dropdown-divider {
+  border: none;
+  height: 1px;
+  background: var(--glass-border);
+  margin: 6px 0;
+}
+
+.np-dropdown-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #e4e4e7;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.np-dropdown-item:hover {
+  background: rgba(255, 78, 205, 0.15) !important;
+  color: #ff4ecd !important;
+  transform: translateX(3px);
+}
+
+.np-dropdown-msg {
+  font-size: 12px;
+  color: var(--vibe-pink);
+  font-weight: 700;
+  padding: 8px;
+  text-align: center;
+}
+
+/* ==========================================
    NEON SEEK PROGRESS BAR
 ========================================== */
 
@@ -599,6 +685,16 @@ input[type="range"].np-volume-bar::-moz-range-thumb:hover {
   .np-title-block p {
     font-size: 15px;
     margin-top: 4px;
+  }
+
+  .np-playlist-dropdown {
+    width: 170px;
+    top: 40px;
+  }
+  
+  .np-dropdown-item {
+    font-size: 12px;
+    padding: 7px 8px;
   }
 
   .np-progress-row {
