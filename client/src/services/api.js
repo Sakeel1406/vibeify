@@ -8,10 +8,14 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Attach JWT token to every request if present in localStorage
+// Attach JWT token to every request from localStorage OR sessionStorage
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token") || localStorage.getItem("vibeify_token");
+    const token =
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token") ||
+      localStorage.getItem("vibeify_token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
