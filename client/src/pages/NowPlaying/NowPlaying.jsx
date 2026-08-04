@@ -39,6 +39,7 @@ const NowPlaying = () => {
   const {
     currentSong,
     queue,
+    songs, // Fallback if queue array is single/empty
     isPlaying,
     progress,
     duration,
@@ -119,9 +120,12 @@ const NowPlaying = () => {
     }
   };
 
-  const upNext = queue
-    .slice(queue.findIndex((s) => s._id === currentSong._id) + 1)
-    .slice(0, 5);
+  // Safe Next Up queue extraction logic
+  const activeQueue = queue && queue.length > 0 ? queue : songs || [];
+  const currentIndex = activeQueue.findIndex((s) => s._id === currentSong._id);
+  const upNext = currentIndex !== -1 
+    ? activeQueue.slice(currentIndex + 1, currentIndex + 6)
+    : activeQueue.filter((s) => s._id !== currentSong._id).slice(0, 5);
 
   const progressPercent = (progress / (duration || 1)) * 100;
   const volumePercent = volume * 100;
@@ -149,6 +153,7 @@ const NowPlaying = () => {
 
         {/* Player Glass Card */}
         <div className="player-card">
+          {/* Song Header Info & Actions */}
           <div className="np-info-row">
             <div className="np-title-block">
               <h1>{currentSong.title}</h1>
@@ -310,7 +315,7 @@ const NowPlaying = () => {
           </div>
         </div>
 
-        {/* Next Up Queue */}
+        {/* Next Up Queue Section */}
         {upNext.length > 0 && (
           <div className="np-panel np-full-width">
             <h3>Next up</h3>
