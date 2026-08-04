@@ -33,6 +33,8 @@ const TABS = [
   { key: "users", label: "Users", icon: <FaUsers /> },
 ];
 
+const DEFAULT_IMAGE = "https://via.placeholder.com/150/1e1e24/ffffff?text=Vibeify";
+
 const Admin = () => {
   const { user } = useAuth();
   const [tab, setTab] = useState("overview");
@@ -86,8 +88,15 @@ const OverviewTab = () => {
 
   useEffect(() => {
     getAdminStats()
-      .then((res) => setStats(res.data))
-      .catch(() => setError(true))
+      .then((res) => {
+        // Safe extraction whether response is res.data.data or direct res.data
+        const payload = res.data?.data || res.data;
+        setStats(payload);
+      })
+      .catch((err) => {
+        console.error("Admin stats fetch error:", err);
+        setError(true);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -104,7 +113,6 @@ const OverviewTab = () => {
     return <p className="muted">Failed to load system metrics. Please refresh.</p>;
   }
 
-  // Ensure counts are parsed as numbers and safely calculate max value
   const uploadActivity = stats.uploadActivity || [];
   const maxCount = Math.max(
     1,
@@ -150,7 +158,6 @@ const OverviewTab = () => {
           <div className="bar-chart">
             {uploadActivity.map((d) => {
               const countVal = Number(d.count) || 0;
-              // Calculate percentage, keeping a minimum height for visibility
               const calculatedHeight = (countVal / maxCount) * 100;
               const barHeight = countVal > 0 ? Math.max(12, calculatedHeight) : 6;
 
@@ -176,7 +183,12 @@ const OverviewTab = () => {
             <ul className="mini-list">
               {stats.recentUploads.map((s) => (
                 <li key={s._id}>
-                  <img src={s.image} alt={s.title} loading="lazy" />
+                  <img
+                    src={s.image || DEFAULT_IMAGE}
+                    alt={s.title}
+                    loading="lazy"
+                    onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+                  />
                   <div>
                     <div className="mini-title">{s.title}</div>
                     <div className="mini-sub">{s.artist}</div>
@@ -234,8 +246,11 @@ const SongsTab = () => {
 
   const loadSongs = () => {
     getSongs()
-      .then((res) => setSongs(res.data))
-      .catch(() => {});
+      .then((res) => {
+        const dataList = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        setSongs(dataList);
+      })
+      .catch((err) => console.error("Load songs error:", err));
   };
 
   useEffect(() => {
@@ -433,7 +448,12 @@ const SongsTab = () => {
       <div className="admin-song-list">
         {filteredSongs.map((song) => (
           <div key={song._id} className="admin-song-row">
-            <img src={song.image} alt={song.title} loading="lazy" />
+            <img
+              src={song.image || DEFAULT_IMAGE}
+              alt={song.title}
+              loading="lazy"
+              onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+            />
             <div className="admin-song-info">
               <div className="song-title">{song.title}</div>
               <div className="song-artist">
@@ -474,8 +494,14 @@ const UsersTab = ({ currentUserId }) => {
 
   const loadUsers = (query) => {
     getAdminUsers(query)
-      .then((res) => setUsers(res.data))
-      .catch(() => {})
+      .then((res) => {
+        // Safe check for user list payload
+        const userList = Array.isArray(res.data) 
+          ? res.data 
+          : (res.data?.users || res.data?.data || []);
+        setUsers(userList);
+      })
+      .catch((err) => console.error("Load users error:", err))
       .finally(() => setLoading(false));
   };
 
@@ -492,8 +518,9 @@ const UsersTab = ({ currentUserId }) => {
     const newRole = u.role === "admin" ? "user" : "admin";
     setActionUserId(u._id);
     try {
-      const { data } = await updateUserRole(u._id, newRole);
-      setUsers((prev) => prev.map((x) => (x._id === data._id ? data : x)));
+      const res = await updateUserRole(u._id, newRole);
+      const updatedUser = res.data?.user || res.data;
+      setUsers((prev) => prev.map((x) => (x._id === u._id ? updatedUser : x)));
     } catch (err) {
       alert(err.response?.data?.message || "Failed to modify role");
     } finally {
