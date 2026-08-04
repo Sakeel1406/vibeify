@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// Fallback to http://localhost:5000/api if VITE_API_URL is not set in .env
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// Standardize Base URL and ensure `/api` suffix is appended properly
+const rawBaseUrl = import.meta.env.VITE_API_URL || "https://vibeify-server.onrender.com";
+const API_BASE_URL = rawBaseUrl.endsWith("/api") ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, "")}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,7 +11,7 @@ const api = axios.create({
 // Attach JWT token to every request if present in localStorage
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || localStorage.getItem("vibeify_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -53,7 +54,7 @@ export const getAdminStats = () => api.get("/admin/stats");
 export const getAdminUsers = (search = "") =>
   api.get(`/admin/users${search ? `?search=${encodeURIComponent(search)}` : ""}`);
 export const updateUserRole = (id, role) =>
-  api.put(`/admin/users/${id}/role`, { role });
+  api.patch(`/admin/users/${id}/role`, { role });
 export const deleteUser = (id) => api.delete(`/admin/users/${id}`);
 
 export default api;
