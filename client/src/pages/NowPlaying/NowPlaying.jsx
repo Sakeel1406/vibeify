@@ -157,7 +157,7 @@ const NowPlaying = () => {
 
             {/* Action Buttons: Like & Add To Playlist */}
             {user && (
-              <div className="np-actions-block" style={{ display: "flex", gap: "12px", position: "relative" }} ref={dropdownRef}>
+              <div className="np-actions-block" ref={dropdownRef}>
                 <button className="np-like-btn" onClick={handleLike} aria-label="Like song">
                   {isLiked ? <FaHeart color="#ff4ecd" /> : <FaRegHeart color="#94a3b8" />}
                 </button>
@@ -173,55 +173,24 @@ const NowPlaying = () => {
 
                 {/* Playlist Dropdown */}
                 {showPlaylistMenu && (
-                  <div 
-                    className="np-playlist-dropdown"
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      top: "35px",
-                      background: "#18181b",
-                      border: "1px solid rgba(255, 255, 255, 0.15)",
-                      borderRadius: "10px",
-                      padding: "8px",
-                      width: "180px",
-                      zIndex: 100,
-                      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.5)",
-                    }}
-                  >
-                    <div style={{ fontSize: "11px", color: "#a1a1aa", padding: "4px 8px", fontWeight: "600" }}>
-                      ADD TO PLAYLIST
-                    </div>
-                    <hr style={{ borderColor: "rgba(255, 255, 255, 0.1)", margin: "4px 0" }} />
+                  <div className="np-playlist-dropdown">
+                    <div className="np-dropdown-header">ADD TO PLAYLIST</div>
+                    <hr className="np-dropdown-divider" />
                     
                     {playlistMessage ? (
-                      <div style={{ fontSize: "12px", color: "#ff4ecd", padding: "6px 8px", textAlign: "center" }}>
-                        {playlistMessage}
-                      </div>
+                      <div className="np-dropdown-msg">{playlistMessage}</div>
                     ) : playlists.length > 0 ? (
                       playlists.map((pl) => (
                         <button
                           key={pl._id}
                           onClick={() => handleAddToPlaylist(pl._id)}
-                          style={{
-                            width: "100%",
-                            textAlign: "left",
-                            background: "transparent",
-                            border: "none",
-                            color: "#e4e4e7",
-                            padding: "6px 8px",
-                            fontSize: "13px",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            transition: "all 0.2s",
-                          }}
-                          onMouseEnter={(e) => (e.target.style.background = "rgba(255, 78, 205, 0.2)")}
-                          onMouseLeave={(e) => (e.target.style.background = "transparent")}
+                          className="np-dropdown-item"
                         >
                           {pl.name}
                         </button>
                       ))
                     ) : (
-                      <div style={{ fontSize: "12px", color: "#71717a", padding: "6px 8px" }}>
+                      <div className="np-dropdown-msg" style={{ color: "#71717a" }}>
                         No playlists found
                       </div>
                     )}

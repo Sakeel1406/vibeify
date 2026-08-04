@@ -48,9 +48,11 @@ export const getRecentlyPlayed = () => api.get("/songs/recent/me");
 
 // ---- Playlists ----
 export const getPlaylists = () => api.get("/playlists");
+export const getUserPlaylists = () => api.get("/playlists");
 export const getPlaylistById = (id) => api.get(`/playlists/${id}`);
 export const createPlaylist = (data) => api.post("/playlists", data);
 export const updatePlaylist = (id, data) => api.put(`/playlists/${id}`, data);
+export const addSongToPlaylist = (playlistId, songId) => api.put(`/playlists/${playlistId}`, { songId });
 export const deletePlaylist = (id) => api.delete(`/playlists/${id}`);
 
 // ---- Admin ----
