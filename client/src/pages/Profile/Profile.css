@@ -1,0 +1,412 @@
+/* ==========================================
+   VIBEIFY PROFILE PAGE (CYBER-GLASS 2026)
+==========================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@600;700;800&display=swap');
+
+/* ==========================================
+   MAIN PAGE CONTAINER
+========================================== */
+.profile-page {
+  padding: 32px 40px 160px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #ffffff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+  animation: profileSlideUp 0.4s ease-out forwards;
+}
+
+@keyframes profileSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Background Ambient Lighting */
+.profile-ambient-glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+}
+
+.glow-left {
+  top: 0;
+  left: -80px;
+  background: #8b5cf6;
+}
+
+.glow-right {
+  bottom: 80px;
+  right: -80px;
+  background: #ff4ecd;
+}
+
+/* ==========================================
+   HEADER CARD
+========================================== */
+
+.profile-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  padding: 36px;
+  background: rgba(18, 18, 24, 0.45);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.profile-header:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #ff4ecd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(255, 78, 205, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+.avatar-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #ff4ecd);
+  filter: blur(20px);
+  opacity: 0.4;
+  z-index: 1;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-label {
+  color: #ff4ecd;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #ffffff 0%, #d8b4fe 50%, #ff4ecd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.profile-email {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ==========================================
+   GLASS PILL ICON STATS GRID
+========================================== */
+
+.profile-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.stat-card {
+  background: rgba(18, 18, 24, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cyan-card:hover { 
+  border-color: rgba(6, 182, 212, 0.4); 
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.15); 
+}
+
+.pink-card:hover { 
+  border-color: rgba(255, 78, 205, 0.4); 
+  box-shadow: 0 10px 25px rgba(255, 78, 205, 0.15); 
+}
+
+.purple-card:hover { 
+  border-color: rgba(139, 92, 246, 0.4); 
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15); 
+}
+
+/* Glass Pill Icon Container Box (44px) */
+.stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Inner Icon Glyph Size (18px) */
+.stat-icon-wrapper .stat-icon {
+  font-size: 18px !important;
+  width: 18px;
+  height: 18px;
+}
+
+.stat-card:hover .stat-icon-wrapper {
+  transform: scale(1.08);
+}
+
+/* 1. Songs Played Glass Style (Cyan / Teal) */
+.stat-icon-wrapper.cyan {
+  background: rgba(6, 182, 212, 0.14);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: #06b6d4;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.2);
+}
+
+/* 2. Liked Songs Glass Style (Pink / Magenta) */
+.stat-icon-wrapper.pink {
+  background: rgba(255, 78, 205, 0.14);
+  border: 1px solid rgba(255, 78, 205, 0.35);
+  color: #ff4ecd;
+  box-shadow: 0 0 14px rgba(255, 78, 205, 0.2);
+}
+
+/* 3. Playlists Created Glass Style (Purple / Violet) */
+.stat-icon-wrapper.purple {
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #8b5cf6;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.2);
+}
+
+.stat-details h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.stat-details p {
+  margin: 5px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   ACCOUNT INFORMATION CARD
+========================================== */
+
+.profile-card {
+  position: relative;
+  z-index: 1;
+  margin-top: 32px;
+  background: rgba(18, 18, 24, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 32px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+}
+
+.card-header-icon {
+  color: #8b5cf6;
+  font-size: 16px;
+}
+
+.card-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  border-radius: 14px;
+}
+
+.info-row span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-row strong {
+  color: #f1f5f9;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.role-tag {
+  text-transform: capitalize;
+}
+
+.status-active {
+  color: #10b981 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+/* Empty State */
+.profile-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: rgba(18, 18, 24, 0.45);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-empty-state h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.muted {
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+/* ==========================================
+   RESPONSIVE MOBILE OVERRIDES
+========================================== */
+
+@media (max-width: 868px) {
+  .profile-stats {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 20px 16px max(100px, env(safe-area-inset-bottom));
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 18px;
+    padding: 24px 18px;
+  }
+
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 38px;
+  }
+
+  .profile-header h1 {
+    font-size: 28px;
+  }
+}

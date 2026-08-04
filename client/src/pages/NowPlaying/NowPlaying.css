@@ -1,0 +1,700 @@
+/* ==========================================
+   VIBEIFY NEXT-GEN NOW PLAYING (2026 EDITION)
+==========================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap');
+
+:root {
+  --vibe-purple: #8b5cf6;
+  --vibe-pink: #ff4ecd;
+  --vibe-cyan: #06b6d4;
+  --glass-bg: rgba(18, 18, 24, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+.now-playing-page {
+  min-height: 100vh;
+  padding: 40px 32px 140px;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #fff;
+  position: relative;
+  
+  /* Animated Mesh Background */
+  background: 
+    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.25) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(255, 78, 205, 0.2) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+    #050508;
+  background-size: 150% 150%;
+  animation: ambientMesh 14s ease infinite alternate;
+}
+
+@keyframes ambientMesh {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* ==========================================
+   TOP BAR
+==========================================*/
+
+.now-playing-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1140px;
+  margin: 0 auto 20px;
+}
+
+.np-back-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.np-back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.np-topbar-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.np-topbar-label strong {
+  color: #fff;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.np-topbar-placeholder {
+  width: 36px;
+}
+
+/* ==========================================
+   HERO LAYOUT
+==========================================*/
+
+.now-playing-body {
+  max-width: 1140px;
+  margin: 10px auto 0;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* ALBUM ART CONTAINER */
+.np-art-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.np-art {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 28px;
+  object-fit: cover;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7);
+  transition: all 0.5s ease;
+  background: transparent !important;
+  z-index: 1;
+}
+
+.np-art-wrap:hover .np-art {
+  transform: scale(1.02);
+}
+
+.np-art-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border-radius: 35px;
+  background: linear-gradient(135deg, var(--vibe-purple), var(--vibe-pink));
+  filter: blur(45px);
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* Console Card */
+.player-card {
+  position: relative;
+  z-index: 1;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: 32px;
+  padding: 40px;
+}
+
+.np-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.np-title-block h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 0;
+  background: linear-gradient(90deg, #ffffff, #d8b4fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.np-title-block p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+.np-like-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 8px;
+}
+
+.np-like-btn:hover {
+  transform: scale(1.2);
+}
+
+/* ==========================================
+   NEON SEEK PROGRESS BAR
+========================================== */
+
+.np-progress-row {
+  margin: 32px 0 12px;
+}
+
+input[type="range"].np-progress-bar {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  accent-color: transparent !important;
+  width: 100%;
+  height: 8px !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+input[type="range"].np-progress-bar::-webkit-slider-runnable-track {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  height: 8px !important;
+  border-radius: 10px !important;
+}
+
+input[type="range"].np-progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  cursor: pointer !important;
+  margin-top: -4px !important;
+  box-shadow: 0 0 12px #ff4ecd, 0 0 20px rgba(139, 92, 246, 0.8) !important;
+  border: none !important;
+  transition: transform 0.2s ease !important;
+}
+
+input[type="range"].np-progress-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.3) !important;
+}
+
+input[type="range"].np-progress-bar::-moz-range-track {
+  background: transparent !important;
+  border: none !important;
+}
+
+input[type="range"].np-progress-bar::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 12px #ff4ecd !important;
+}
+
+.np-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+/* Controls */
+.np-controls-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  margin: 32px 0 16px;
+}
+
+.ctrl-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+}
+
+.ctrl-btn:hover,
+.ctrl-btn.active {
+  color: #fff;
+  transform: scale(1.15);
+}
+
+.ctrl-btn.active {
+  color: var(--vibe-pink);
+}
+
+.np-play-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--vibe-purple), var(--vibe-pink));
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.45);
+  transition: transform 0.25s ease;
+}
+
+.np-play-btn:hover {
+  transform: scale(1.08);
+}
+
+/* ==========================================
+   2026 CYBER-GLASS VOLUME BAR STYLES
+========================================== */
+
+.np-volume-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 220px;
+  margin: 18px auto 0;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 30px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05),
+              0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.np-volume-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 78, 205, 0.3);
+  box-shadow: 0 0 15px rgba(255, 78, 205, 0.2);
+}
+
+/* Track Styling */
+input[type="range"].np-volume-bar {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 110px !important;
+  height: 5px !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+input[type="range"].np-volume-bar::-webkit-slider-runnable-track {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background: transparent !important;
+  height: 5px !important;
+  border-radius: 10px !important;
+}
+
+/* Chrome / Safari Thumb */
+input[type="range"].np-volume-bar::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  margin-top: -4px !important;
+  box-shadow: 0 0 10px #ff4ecd, 0 0 18px rgba(139, 92, 246, 0.9) !important;
+  border: 2px solid rgba(255, 78, 205, 0.8) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+}
+
+input[type="range"].np-volume-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.3) !important;
+  box-shadow: 0 0 14px #ff4ecd, 0 0 24px rgba(255, 78, 205, 1) !important;
+}
+
+/* Firefox Support */
+input[type="range"].np-volume-bar::-moz-range-track {
+  background: transparent !important;
+  height: 5px !important;
+  border-radius: 10px !important;
+}
+
+input[type="range"].np-volume-bar::-moz-range-thumb {
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 10px #ff4ecd, 0 0 18px rgba(139, 92, 246, 0.9) !important;
+  border: 2px solid rgba(255, 78, 205, 0.8) !important;
+  cursor: pointer !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+input[type="range"].np-volume-bar::-moz-range-thumb:hover {
+  transform: scale(1.3) !important;
+}
+
+/* Speaker Icon Button */
+.ctrl-btn.vol-btn {
+  font-size: 14px;
+  padding: 4px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ctrl-btn.vol-btn:hover {
+  color: #ff4ecd;
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(255, 78, 205, 0.6));
+}
+
+/* ==========================================
+   PANELS (ARTIST & CREDITS)
+========================================== */
+
+.now-playing-panels {
+  max-width: 1140px;
+  margin: 40px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.np-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 28px;
+  transition: transform 0.3s ease;
+}
+
+.np-panel:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.np-panel h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #f1f5f9;
+}
+
+.np-full-width {
+  grid-column: span 2;
+}
+
+/* Artist Card */
+.np-artist-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.np-artist-img {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.np-artist-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.np-artist-blurb {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* Credit Grid */
+.credit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.credit-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.credit-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+}
+
+.credit-val {
+  font-size: 15px;
+  color: #f1f5f9;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* Queue Row */
+.np-queue-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  transition: background 0.25s ease;
+}
+
+.np-queue-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.np-queue-row img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.np-queue-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.np-queue-artist {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ==========================================
+   MOBILE & TABLET RESPONSIVE OVERRIDES
+========================================== */
+
+@media (max-width: 1024px) {
+  .now-playing-body {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .np-art-wrap {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .now-playing-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .np-full-width {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .now-playing-page {
+    padding: 20px 16px max(100px, env(safe-area-inset-bottom));
+  }
+
+  .now-playing-topbar {
+    margin-bottom: 16px;
+  }
+
+  .np-back-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .np-topbar-placeholder {
+    width: 42px;
+  }
+
+  .np-art-wrap {
+    max-width: 220px;
+  }
+
+  .np-art {
+    border-radius: 20px;
+  }
+
+  .player-card {
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
+
+  .np-title-block h1 {
+    font-size: 26px;
+  }
+
+  .np-title-block p {
+    font-size: 15px;
+    margin-top: 4px;
+  }
+
+  .np-progress-row {
+    margin: 20px 0 8px;
+  }
+
+  .np-controls-row {
+    gap: 18px;
+    margin: 18px 0 12px;
+  }
+
+  .ctrl-btn {
+    font-size: 22px;
+    padding: 10px;
+  }
+
+  .np-play-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+  }
+
+  /* Compact Capsule Volume on Mobile */
+  .np-volume-row {
+    max-width: 160px;
+    margin-top: 12px;
+    padding: 4px 10px;
+    gap: 8px;
+    border-radius: 20px;
+  }
+
+  input[type="range"].np-volume-bar {
+    width: 85px !important;
+    height: 4px !important;
+  }
+
+  input[type="range"].np-volume-bar::-webkit-slider-thumb {
+    width: 11px !important;
+    height: 11px !important;
+    margin-top: -3.5px !important;
+  }
+
+  input[type="range"].np-volume-bar::-moz-range-thumb {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .ctrl-btn.vol-btn {
+    font-size: 13px;
+  }
+
+  .now-playing-panels {
+    margin-top: 24px;
+    gap: 16px;
+  }
+
+  .np-panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .np-artist-card {
+    gap: 14px;
+  }
+
+  .np-artist-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .np-artist-name {
+    font-size: 17px;
+  }
+
+  .np-artist-blurb {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .np-art-wrap {
+    max-width: 180px;
+  }
+
+  .np-controls-row {
+    gap: 12px;
+  }
+
+  .ctrl-btn {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  .np-play-btn {
+    width: 54px;
+    height: 54px;
+    font-size: 20px;
+  }
+}
