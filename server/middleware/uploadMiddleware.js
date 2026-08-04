@@ -6,13 +6,14 @@ const cloudinary = require("../config/cloudinary");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    const isAudio = file.mimetype.startsWith("audio");
+    // Rely on fieldname ("audio" vs "image") instead of unreliable client mimetype
+    const isAudioField = file.fieldname === "audio";
 
     return {
-      folder: isAudio ? "vibeify_uploads/songs" : "vibeify_uploads/images",
-      resource_type: isAudio ? "video" : "image", // Cloudinary treats audio as 'video' resource_type
-      allowed_formats: isAudio
-        ? ["mp3", "wav", "ogg", "m4a"]
+      folder: isAudioField ? "vibeify_uploads/songs" : "vibeify_uploads/images",
+      resource_type: isAudioField ? "video" : "image", // Cloudinary treats audio as 'video' resource_type
+      allowed_formats: isAudioField
+        ? ["mp3", "wav", "ogg", "m4a", "mp4"]
         : ["jpg", "png", "jpeg", "webp"],
     };
   },
@@ -20,21 +21,30 @@ const storage = new CloudinaryStorage({
 
 // File Validation Middleware
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "audio" && !file.mimetype.startsWith("audio/")) {
-    return cb(new Error("Audio field must be a valid audio file"), false);
+  if (file.fieldname === "audio") {
+    // Allow standard audio MIME types and video/mp4 containers for audio tracks
+    if (file.mimetype.startsWith("audio/") || file.mimetype.includes("mpeg") || file.mimetype.includes("mp4")) {
+      return cb(null, true);
+    }
+    return cb(new Error("Audio field must be a valid audio file (MP3/WAV)"), false);
   }
-  if (file.fieldname === "image" && !file.mimetype.startsWith("image/")) {
-    return cb(new Error("Image field must be a valid image file"), false);
+
+  if (file.fieldname === "image") {
+    if (file.mimetype.startsWith("image/")) {
+      return cb(null, true);
+    }
+    return cb(new Error("Image field must be a valid image file (JPG/PNG)"), false);
   }
+
   cb(null, true);
 };
 
-// Multer Middleware with 25MB Size Limit
+// Multer Middleware with 50MB Size Limit
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 25 * 1024 * 1024, // 25MB Max file size limit
+    fileSize: 50 * 1024 * 1024, // 50MB Max file size limit
   },
 });
 
