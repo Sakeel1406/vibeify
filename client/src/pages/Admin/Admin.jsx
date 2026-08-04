@@ -89,7 +89,6 @@ const OverviewTab = () => {
   useEffect(() => {
     getAdminStats()
       .then((res) => {
-        // Safe extraction whether response is res.data.data or direct res.data
         const payload = res.data?.data || res.data;
         setStats(payload);
       })
@@ -267,12 +266,50 @@ const SongsTab = () => {
     if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
+  // 🔑 Audio Selection Handler with Strict Type Guard
+  const handleAudioSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav|m4a|aac|ogg)$/i)) {
+      setStatus({
+        type: "error",
+        msg: `Selected audio track format (${file.type || "unknown"}) is invalid. Please select an MP3 or WAV file.`,
+      });
+      setAudioFile(null);
+      if (audioInputRef.current) audioInputRef.current.value = "";
+      return;
+    }
+
+    setStatus({ type: "", msg: "" });
+    setAudioFile(file);
+  };
+
+  // 🔑 Image Selection Handler with Strict Type Guard
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setStatus({
+        type: "error",
+        msg: `Image file format ${file.type.split("/")[1] || "invalid"} not allowed. Please select a PNG or JPG image.`,
+      });
+      setImageFile(null);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+      return;
+    }
+
+    setStatus({ type: "", msg: "" });
+    setImageFile(file);
+  };
+
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!audioFile || !imageFile || !title.trim() || !artist.trim()) {
       setStatus({
         type: "error",
-        msg: "Please complete all required fields and select both files.",
+        msg: "Please complete all required fields and select both valid files.",
       });
       return;
     }
@@ -359,8 +396,8 @@ const SongsTab = () => {
               <input
                 ref={audioInputRef}
                 type="file"
-                accept="audio/*"
-                onChange={(e) => setAudioFile(e.target.files[0] || null)}
+                accept="audio/mp3,audio/wav,audio/mpeg,audio/*"
+                onChange={handleAudioSelect}
                 required
               />
               {audioFile && (
@@ -389,8 +426,8 @@ const SongsTab = () => {
               <input
                 ref={imageInputRef}
                 type="file"
-                accept="image/*"
-                onChange={(e) => setImageFile(e.target.files[0] || null)}
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/*"
+                onChange={handleImageSelect}
                 required
               />
               {imageFile && (
@@ -495,7 +532,6 @@ const UsersTab = ({ currentUserId }) => {
   const loadUsers = (query) => {
     getAdminUsers(query)
       .then((res) => {
-        // Safe check for user list payload
         const userList = Array.isArray(res.data) 
           ? res.data 
           : (res.data?.users || res.data?.data || []);
