@@ -1,9 +1,9 @@
 const Song = require("../models/Song");
 const User = require("../models/User");
-const fs = require("fs");
-const path = require("path");
 
-// @route GET /api/songs
+// @desc    Get all songs (with optional search filter)
+// @route   GET /api/songs
+// @access  Public
 const getSongs = async (req, res) => {
   try {
     const { search } = req.query;
@@ -26,7 +26,9 @@ const getSongs = async (req, res) => {
   }
 };
 
-// @route GET /api/songs/:id
+// @desc    Get single song by ID
+// @route   GET /api/songs/:id
+// @access  Public
 const getSongById = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -37,53 +39,59 @@ const getSongById = async (req, res) => {
   }
 };
 
-// @route POST /api/songs (admin, multipart form: audio, image, title, artist, album, duration)
+// @desc    Create/Upload a new song to Cloudinary
+// @route   POST /api/songs
+// @access  Private/Admin
 const createSong = async (req, res) => {
   try {
     const { title, artist, album, duration } = req.body;
 
-    if (!req.files || !req.files.audio || !req.files.image) {
-      return res.status(400).json({ message: "Audio and image files are required" });
+    if (!req.files || !req.files.audio) {
+      return res.status(400).json({ message: "Audio file is required" });
     }
 
-    const audioFile = req.files.audio[0];
-    const imageFile = req.files.image[0];
+    // Retrieve Cloudinary secure URLs from req.files
+    const audioUrl = req.files.audio[0].path;
+    const imageUrl = req.files.image ? req.files.image[0].path : "";
 
     const song = await Song.create({
       title,
       artist,
       album: album || "Single",
       duration: duration || 0,
-      audio: `/uploads/songs/${audioFile.filename}`,
-      image: `/uploads/images/${imageFile.filename}`,
+      songUrl: audioUrl,     // Cloudinary CDN link
+      coverImage: imageUrl,  // Cloudinary CDN link
+      audio: audioUrl,       // Fallback for frontend field reference
+      image: imageUrl,       // Fallback for frontend field reference
     });
 
-    res.status(201).json(song);
+    res.status(201).json({
+      message: "Song uploaded successfully!",
+      song,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @route DELETE /api/songs/:id (admin)
+// @desc    Delete song from Database
+// @route   DELETE /api/songs/:id
+// @access  Private/Admin
 const deleteSong = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
     if (!song) return res.status(404).json({ message: "Song not found" });
 
-    // remove files from disk (best-effort)
-    [song.audio, song.image].forEach((relPath) => {
-      const fullPath = path.join(__dirname, "..", relPath);
-      fs.unlink(fullPath, () => {});
-    });
-
     await song.deleteOne();
-    res.json({ message: "Song deleted" });
+    res.json({ message: "Song deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @route PUT /api/songs/:id/like (toggle like)
+// @desc    Toggle like / unlike song
+// @route   PUT /api/songs/:id/like
+// @access  Private
 const toggleLikeSong = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -104,7 +112,9 @@ const toggleLikeSong = async (req, res) => {
   }
 };
 
-// @route GET /api/songs/liked/me
+// @desc    Get user's liked songs
+// @route   GET /api/songs/liked/me
+// @access  Private
 const getLikedSongs = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("likedSongs");
@@ -114,7 +124,9 @@ const getLikedSongs = async (req, res) => {
   }
 };
 
-// @route POST /api/songs/:id/play (record recently played)
+// @desc    Record played song in history
+// @route   POST /api/songs/:id/play
+// @access  Private
 const recordPlay = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -131,7 +143,9 @@ const recordPlay = async (req, res) => {
   }
 };
 
-// @route GET /api/songs/recent/me
+// @desc    Get user's recently played songs
+// @route   GET /api/songs/recent/me
+// @access  Private
 const getRecentlyPlayed = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("recentlyPlayed");

@@ -9,19 +9,19 @@ connectDB();
 
 const app = express();
 
-// Allowed origins for development and production
+// Allowed origins for local development and production deployments
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://vibeify-ashy.vercel.app",
-  process.env.CLIENT_URL
+  process.env.CLIENT_URL,
 ].filter(Boolean);
 
-// CORS configuration supporting credentials and multiple origins
+// Dynamic CORS configuration supporting cookies/headers across allowed origins
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (e.g., Postman or mobile apps)
+      // Allow requests with no origin (e.g., Postman, Curl, Mobile apps)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -32,10 +32,11 @@ app.use(
   })
 );
 
+// Body parser middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded audio/image files statically
+// Serve local uploads statically as fallback (if needed)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ==========================================
@@ -45,31 +46,29 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/songs", require("./routes/songRoutes"));
 app.use("/api/playlists", require("./routes/playlistRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
 
-// User routes
-const userRoutes = require("./routes/userRoutes");
-app.use("/api/users", userRoutes);
-
+// Root Health Check Route
 app.get("/", (req, res) => {
-  res.send("Spotify Clone API is running");
+  res.send("Vibeify API is running cleanly!");
 });
 
 // ==========================================
-// ERROR HANDLERS
+// ERROR HANDLING MIDDLEWARES
 // ==========================================
 
-// 404 handler (Must be below all other routes)
+// 404 Handler for undefined routes
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Global error handler
+// Global Centralized Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Error Stack:", err.stack);
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

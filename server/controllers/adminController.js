@@ -2,7 +2,9 @@ const User = require("../models/User");
 const Song = require("../models/Song");
 const Playlist = require("../models/Playlist");
 
-// @route GET /api/admin/stats
+// @desc    Get dashboard statistics & upload analytics
+// @route   GET /api/admin/stats
+// @access  Private/Admin
 const getStats = async (req, res) => {
   try {
     const [totalUsers, totalSongs, totalPlaylists, totalAdmins] = await Promise.all([
@@ -12,13 +14,14 @@ const getStats = async (req, res) => {
       User.countDocuments({ role: "admin" }),
     ]);
 
-    // songs added per day for the last 7 days (simple upload activity chart)
+    // Calculate start date for last 7 days chart
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
     const recentSongs = await Song.find({ createdAt: { $gte: sevenDaysAgo } }).select("createdAt");
 
+    // Initialize 7-day buckets (YYYY-MM-DD)
     const dayBuckets = {};
     for (let i = 0; i < 7; i++) {
       const d = new Date(sevenDaysAgo);
@@ -26,6 +29,8 @@ const getStats = async (req, res) => {
       const key = d.toISOString().slice(0, 10);
       dayBuckets[key] = 0;
     }
+
+    // Populate counts per day
     recentSongs.forEach((song) => {
       const key = song.createdAt.toISOString().slice(0, 10);
       if (dayBuckets[key] !== undefined) dayBuckets[key] += 1;
@@ -33,11 +38,11 @@ const getStats = async (req, res) => {
 
     const uploadActivity = Object.entries(dayBuckets).map(([date, count]) => ({ date, count }));
 
-    // most recently added songs
-    const recentUploads = await Song.find().sort({ createdAt: -1 }).limit(5);
-
-    // most recently registered users
-    const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5).select("-password");
+    // Fetch recent uploads and users concurrently
+    const [recentUploads, recentUsers] = await Promise.all([
+      Song.find().sort({ createdAt: -1 }).limit(5),
+      User.find().sort({ createdAt: -1 }).limit(5).select("-password"),
+    ]);
 
     res.json({
       totalUsers,
@@ -53,11 +58,14 @@ const getStats = async (req, res) => {
   }
 };
 
-// @route GET /api/admin/users
+// @desc    Get all registered users (with search query)
+// @route   GET /api/admin/users
+// @access  Private/Admin
 const getUsers = async (req, res) => {
   try {
     const { search } = req.query;
     let query = {};
+
     if (search) {
       query = {
         $or: [
@@ -66,6 +74,7 @@ const getUsers = async (req, res) => {
         ],
       };
     }
+
     const users = await User.find(query).select("-password").sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
@@ -73,14 +82,18 @@ const getUsers = async (req, res) => {
   }
 };
 
-// @route PUT /api/admin/users/:id/role  { role: "admin" | "user" }
+// @desc    Update user role (promote/demote)
+// @route   PUT /api/admin/users/:id/role
+// @access  Private/Admin
 const updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
+
     if (!["user", "admin"].includes(role)) {
       return res.status(400).json({ message: "Role must be 'user' or 'admin'" });
     }
 
+    // Prevent self-demotion
     if (req.params.id === req.user._id.toString() && role === "user") {
       return res.status(400).json({ message: "You can't remove your own admin access" });
     }
@@ -94,9 +107,12 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-// @route DELETE /api/admin/users/:id
+// @desc    Delete user account and their associated playlists
+// @route   DELETE /api/admin/users/:id
+// @access  Private/Admin
 const deleteUser = async (req, res) => {
   try {
+    // Prevent self-deletion
     if (req.params.id === req.user._id.toString()) {
       return res.status(400).json({ message: "You can't delete your own account from here" });
     }
@@ -107,10 +123,15 @@ const deleteUser = async (req, res) => {
     await user.deleteOne();
     await Playlist.deleteMany({ userId: user._id });
 
-    res.json({ message: "User deleted" });
+    res.json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { getStats, getUsers, updateUserRole, deleteUser };
+module.exports = {
+  getStats,
+  getUsers,
+  updateUserRole,
+  deleteUser,
+};
