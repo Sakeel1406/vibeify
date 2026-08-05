@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 // Context
 import { AuthProvider } from "./context/AuthContext";
+import { PlayerProvider } from "./context/PlayerContext";
 
 // Layout
 import Layout from "./layouts/Layout";
@@ -27,36 +28,38 @@ import "./App.css";
 function App() {
   return (
     <AuthProvider>
-      <Routes>
-        {/* Standalone Auth Routes (Render without Sidebar/Navbar/Player) */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+      <PlayerProvider>
+        <Routes>
+          {/* Standalone Auth Routes (Render without Sidebar/Navbar/Player) */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Main Application Shell Routes (Wrapped in Layout) */}
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/now-playing" element={<NowPlaying />} />
+          {/* Main Application Shell Routes (Wrapped in Layout) */}
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/now-playing" element={<NowPlaying />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/playlist/:id"
-            element={
-              <ProtectedRoute>
-                <PlaylistDetails />
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected Routes */}
+            <Route
+              path="/playlist/:id"
+              element={
+                <ProtectedRoute>
+                  <PlaylistDetails />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Fallback Catch-All */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+            {/* Fallback Catch-All */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </PlayerProvider>
     </AuthProvider>
   );
 }
