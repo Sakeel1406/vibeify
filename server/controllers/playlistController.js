@@ -44,9 +44,6 @@ const getPlaylistById = async (req, res) => {
 // @access  Private
 const createPlaylist = async (req, res) => {
   try {
-    console.log("--> CREATE PLAYLIST REQUEST BODY:", req.body);
-    console.log("--> AUTH USER IN REQ:", req.user);
-
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized. User context missing." });
     }
@@ -67,7 +64,6 @@ const createPlaylist = async (req, res) => {
       songs: [],
     });
 
-    console.log("--> PLAYLIST CREATED SUCCESSFULLY:", playlist);
     return res.status(201).json(playlist);
   } catch (error) {
     console.error("CREATE PLAYLIST ERROR DETAILS:", error);
@@ -94,20 +90,21 @@ const updatePlaylist = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to edit this playlist" });
     }
 
-    const { name, isPublic, coverImage, addSongId, removeSongId } = req.body;
+    const { name, isPublic, coverImage, addSongId, songId, removeSongId } = req.body;
 
     if (name) playlist.name = name.trim();
     if (isPublic !== undefined) playlist.isPublic = isPublic;
     if (coverImage !== undefined) playlist.coverImage = coverImage;
 
-    // Prevent duplicate song additions
-    if (addSongId && !playlist.songs.some((id) => id.toString() === addSongId)) {
-      playlist.songs.push(addSongId);
+    // Handle song addition (supports both addSongId and songId)
+    const targetSongId = addSongId || songId;
+    if (targetSongId && !playlist.songs.some((id) => id.toString() === targetSongId.toString())) {
+      playlist.songs.push(targetSongId);
     }
 
     // Remove song from playlist
     if (removeSongId) {
-      playlist.songs = playlist.songs.filter((id) => id.toString() !== removeSongId);
+      playlist.songs = playlist.songs.filter((id) => id.toString() !== removeSongId.toString());
     }
 
     await playlist.save();

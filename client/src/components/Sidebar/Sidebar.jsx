@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Touch gesture tracking fix
+  // Touch gesture tracking for mobile swipe-to-close
   const touchStartX = useRef(0);
   const touchCurrentX = useRef(0);
 
@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     };
   }, [user]);
 
-  // Touch gesture handlers — Only close if explicitly swiped left > 70px
+  // Touch gesture handlers — Close if swiped left > 70px
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
     touchCurrentX.current = e.touches[0].clientX;
@@ -71,7 +71,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     if (diff > 70) {
       if (onClose) onClose();
     }
-    // Reset positions
     touchStartX.current = 0;
     touchCurrentX.current = 0;
   };
@@ -127,6 +126,15 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
+      {/* Mobile Glass Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
       <aside
         className={`sidebar ${isOpen ? "mobile-open" : ""}`}
         onTouchStart={handleTouchStart}
@@ -137,7 +145,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="mobile-swipe-bar" aria-hidden="true" />
 
         <div className="sidebar-top">
-          {/* Header */}
+          {/* Header Row */}
           <div className="sidebar-header-row">
             <div className="brand">
               <img src={logo} alt="Vibeify Logo" className="brand-logo" />
@@ -154,7 +162,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Main Navigation */}
+          {/* Main Navigation Links */}
           <nav className="main-nav" aria-label="Main Navigation">
             <NavLink to="/" end onClick={handleNavClick} className="nav-item">
               <FaHome />
@@ -205,7 +213,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
           <div className="divider" role="separator" />
 
-          {/* User Playlists Stream */}
+          {/* User Playlists */}
           <div className="playlist-list">
             {playlists.length > 0 ? (
               playlists.map((playlist) => (
@@ -256,7 +264,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <p className="modal-subtitle">Configure your vibe and visibility</p>
             </div>
 
-            {/* Animated Audio Wave Artwork Preview */}
+            {/* Audio Wave Artwork Preview */}
             <div className="playlist-art-preview">
               <div className="art-glow" />
               <div className="audio-waves">
@@ -276,7 +284,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               </p>
             )}
 
-            {/* Modal Form Controls */}
+            {/* Form Controls */}
             <form onSubmit={handleCreatePlaylist} className="modal-body">
               <div>
                 <label className="modal-label">Playlist Name</label>
