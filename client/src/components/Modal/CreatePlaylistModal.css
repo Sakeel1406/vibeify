@@ -1,7 +1,3 @@
-/* ==========================================
-   CYBER-GLASS MODAL STYLES
-========================================== */
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -109,9 +105,6 @@
   border-color: rgba(244, 63, 94, 0.4);
 }
 
-/* ==========================================
-   NEON TITLE GLOW EFFECT
-========================================== */
 
 .modal-header .modal-title {
   font-family: 'Outfit', sans-serif;
@@ -134,7 +127,7 @@
   margin: 0 0 20px;
 }
 
-/* Artwork Preview */
+
 .playlist-art-preview {
   position: relative;
   height: 110px;
@@ -195,7 +188,7 @@
   text-overflow: ellipsis;
 }
 
-/* Form Controls */
+
 .modal-body {
   display: flex;
   flex-direction: column;
@@ -230,7 +223,7 @@
   box-shadow: 0 0 16px var(--accent-glow, rgba(255, 78, 205, 0.3));
 }
 
-/* Privacy Selector Chips */
+
 .privacy-options {
   display: flex;
   gap: 12px;
@@ -269,7 +262,7 @@
   color: var(--accent-secondary, #ff4ecd);
 }
 
-/* Buttons */
+
 .modal-actions {
   display: flex;
   gap: 12px;

@@ -39,9 +39,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve local uploads statically as fallback (if needed)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ==========================================
+
 // API ROUTES
-// ==========================================
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/songs", require("./routes/songRoutes"));
 app.use("/api/playlists", require("./routes/playlistRoutes"));
@@ -53,9 +53,8 @@ app.get("/", (req, res) => {
   res.send("Vibeify API is running cleanly!");
 });
 
-// ==========================================
+
 // ERROR HANDLING MIDDLEWARES
-// ==========================================
 
 // 404 Handler for undefined routes
 app.use((req, res) => {

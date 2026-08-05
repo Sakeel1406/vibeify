@@ -1,7 +1,3 @@
-/* ==========================================
-   VIBEIFY SONG CARD STYLES (2026 EDITION)
-==========================================*/
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 .song-card {
@@ -125,9 +121,7 @@
 }
 
 
-/* ==========================================
-   MOBILE RESPONSIVE OVERRIDES (< 768px)
-========================================== */
+/* MOBILE RESPONSIVE OVERRIDES (< 768px) */
 
 @media (max-width: 768px) {
   /* 1. Reduce padding & card height */

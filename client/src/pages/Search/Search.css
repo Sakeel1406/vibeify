@@ -1,12 +1,6 @@
-/* ==========================================
-   VIBEIFY SEARCH PAGE (CYBER-GLASS 2026)
-==========================================*/
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@600;700;800&display=swap');
 
-/* ===========================
-   SEARCH PAGE CONTAINER
-=========================== */
+/* SEARCH PAGE CONTAINER */
 
 .search-page {
   padding: 32px 40px 160px;
@@ -29,9 +23,7 @@
   }
 }
 
-/* ===========================
-   SEARCH BAR
-=========================== */
+/* SEARCH BAR */
 
 .search-input-wrap {
   position: relative;
@@ -83,9 +75,7 @@
   color: #ff4ecd;
 }
 
-/* ===========================
-   SECTIONS
-=========================== */
+/* SECTIONS */
 
 .search-section {
   margin-bottom: 44px;
@@ -100,9 +90,7 @@
   letter-spacing: -0.3px;
 }
 
-/* ===========================
-   SONG & ALBUM GRID
-=========================== */
+/* SONG & ALBUM GRID */
 
 .song-grid {
   display: grid;
@@ -110,9 +98,7 @@
   gap: 22px;
 }
 
-/* ===========================
-   GENRE CHIPS / CATEGORIES
-=========================== */
+/* GENRE CHIPS / CATEGORIES */
 
 .chip-grid {
   display: flex;
@@ -152,9 +138,7 @@
   transform: scale(0.96);
 }
 
-/* ===========================
-   CARD STYLES
-=========================== */
+/* CARD STYLES */
 
 .search-card {
   background: rgba(18, 18, 24, 0.45);
@@ -223,9 +207,7 @@
   margin: 0;
 }
 
-/* ===========================
-   TEXT & UTILITIES
-=========================== */
+/* TEXT & UTILITIES */
 
 .muted {
   color: #94a3b8;
@@ -243,9 +225,7 @@
   border-radius: 10px;
 }
 
-/* ==========================================
-   RESPONSIVE MOBILE OVERRIDES
-========================================== */
+/* RESPONSIVE MOBILE OVERRIDES */
 
 @media (max-width: 992px) {
   .song-grid {

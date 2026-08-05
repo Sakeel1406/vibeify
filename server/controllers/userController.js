@@ -1,9 +1,9 @@
 const Playlist = require("../models/Playlist");
 const User = require("../models/User");
 
-// @desc    Get user profile with live stats
-// @route   GET /api/users/profile
-// @access  Private
+// Get user profile with live stats
+// GET /api/users/profile
+// Private
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;

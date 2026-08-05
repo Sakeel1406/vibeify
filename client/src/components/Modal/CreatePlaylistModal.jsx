@@ -111,7 +111,7 @@ export default function CreatePlaylistModal({
             </div>
           </div>
 
-          {/* Modal Actions */}
+          {/* Modal Action Buttons */}
           <div className="modal-actions">
             <button
               type="button"

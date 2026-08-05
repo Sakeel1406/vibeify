@@ -1,7 +1,3 @@
-/* ==========================================
-   VIBEIFY COMPACT CYBER-GLASS V2 PLAYER (2026)
-==========================================*/
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 .player-wrapper {
@@ -341,9 +337,7 @@ input[type="range"].volume-bar::-webkit-slider-thumb:hover {
   display: none;
 }
 
-/* ==========================================
-   MOBILE FLOATING CAPSULE (< 768px)
-========================================== */
+/* MOBILE FLOATING CAPSULE (< 768px) */
 
 @media (max-width: 768px) {
   .player-wrapper {

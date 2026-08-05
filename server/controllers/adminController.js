@@ -2,9 +2,9 @@ const User = require("../models/User");
 const Song = require("../models/Song");
 const Playlist = require("../models/Playlist");
 
-// @desc    Get dashboard statistics & upload analytics
-// @route   GET /api/admin/stats
-// @access  Private/Admin
+// Get dashboard statistics & upload analytics
+// GET /api/admin/stats
+// Private/Admin
 const getStats = async (req, res) => {
   try {
     const [totalUsers, totalSongs, totalPlaylists, totalAdmins] = await Promise.all([
@@ -58,9 +58,9 @@ const getStats = async (req, res) => {
   }
 };
 
-// @desc    Get all registered users (with search query)
-// @route   GET /api/admin/users
-// @access  Private/Admin
+// Get all registered users (with search query)
+// GET /api/admin/users
+// Private/Admin
 const getUsers = async (req, res) => {
   try {
     const { search } = req.query;
@@ -82,9 +82,9 @@ const getUsers = async (req, res) => {
   }
 };
 
-// @desc    Update user role (promote/demote)
-// @route   PUT /api/admin/users/:id/role
-// @access  Private/Admin
+// Update user role (promote/demote)
+// PUT /api/admin/users/:id/role
+// Private/Admin
 const updateUserRole = async (req, res) => {
   try {
     const { role } = req.body;
@@ -107,9 +107,9 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-// @desc    Delete user account and their associated playlists
-// @route   DELETE /api/admin/users/:id
-// @access  Private/Admin
+// Delete user account and their associated playlists
+// DELETE /api/admin/users/:id
+// Private/Admin
 const deleteUser = async (req, res) => {
   try {
     // Prevent self-deletion

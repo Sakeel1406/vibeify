@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-/* ==========================================
-   VIBEIFY DYNAMIC THEME ENGINE (VARIABLES)
-==========================================*/
+/* VIBEIFY DYNAMIC THEME ENGINE (VARIABLES)*/
 
 :root {
   --accent-primary: #8b5cf6;
@@ -12,9 +10,7 @@
   --glass-blur: 24px;
 }
 
-/* ==========================================
-   APP SHELL & DYNAMIC MAIN LAYOUT
-========================================== */
+/* APP SHELL & DYNAMIC MAIN LAYOUT */
 
 #root {
   width: 100%;
@@ -101,9 +97,7 @@
   }
 }
 
-/* ==========================================
-   DYNAMIC COMPONENT ACCENTS (THEME SYNCHRONIZED)
-========================================== */
+/* DYNAMIC COMPONENT ACCENTS (THEME SYNCHRONIZED) */
 
 /* 1. Active Sidebar Links & Navigation */
 .sidebar-item.active,
@@ -166,9 +160,7 @@ button.primary-btn {
   color: var(--accent-secondary) !important;
 }
 
-/* ==========================================
-   MOBILE RESPONSIVE RULES (Max-Width: 768px)
-========================================== */
+/* MOBILE RESPONSIVE RULES (Max-Width: 768px)*/
 
 @media (max-width: 768px) {
   .sidebar {

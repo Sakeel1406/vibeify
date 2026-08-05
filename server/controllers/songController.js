@@ -1,9 +1,9 @@
 const Song = require("../models/Song");
 const User = require("../models/User");
 
-// @desc    Get all songs (with optional search filter)
-// @route   GET /api/songs
-// @access  Public
+// Get all songs (with optional search filter)
+// GET /api/songs
+// Public
 const getSongs = async (req, res) => {
   try {
     const { search } = req.query;
@@ -26,9 +26,9 @@ const getSongs = async (req, res) => {
   }
 };
 
-// @desc    Get single song by ID
-// @route   GET /api/songs/:id
-// @access  Public
+// Get single song by ID
+// GET /api/songs/:id
+// Public
 const getSongById = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -39,9 +39,9 @@ const getSongById = async (req, res) => {
   }
 };
 
-// @desc    Create/Upload a new song to Cloudinary
-// @route   POST /api/songs
-// @access  Private/Admin
+// Create/Upload a new song to Cloudinary
+// POST /api/songs
+// Private/Admin
 const createSong = async (req, res) => {
   try {
     const { title, artist, album, duration } = req.body;
@@ -74,9 +74,9 @@ const createSong = async (req, res) => {
   }
 };
 
-// @desc    Delete song from Database
-// @route   DELETE /api/songs/:id
-// @access  Private/Admin
+// Delete song from Database
+// DELETE /api/songs/:id
+// Private/Admin
 const deleteSong = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -89,9 +89,9 @@ const deleteSong = async (req, res) => {
   }
 };
 
-// @desc    Toggle like / unlike song
-// @route   PUT /api/songs/:id/like
-// @access  Private
+// Toggle like / unlike song
+// PUT /api/songs/:id/like
+// Private
 const toggleLikeSong = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -112,9 +112,9 @@ const toggleLikeSong = async (req, res) => {
   }
 };
 
-// @desc    Get user's liked songs
-// @route   GET /api/songs/liked/me
-// @access  Private
+// Get user's liked songs
+// GET /api/songs/liked/me
+// Private
 const getLikedSongs = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("likedSongs");
@@ -124,9 +124,9 @@ const getLikedSongs = async (req, res) => {
   }
 };
 
-// @desc    Record played song in history
-// @route   POST /api/songs/:id/play
-// @access  Private
+// Record played song in history
+// POST /api/songs/:id/play
+// Private
 const recordPlay = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -143,9 +143,9 @@ const recordPlay = async (req, res) => {
   }
 };
 
-// @desc    Get user's recently played songs
-// @route   GET /api/songs/recent/me
-// @access  Private
+// Get user's recently played songs
+// GET /api/songs/recent/me
+// Private
 const getRecentlyPlayed = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("recentlyPlayed");

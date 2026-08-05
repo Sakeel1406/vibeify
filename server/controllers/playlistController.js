@@ -1,8 +1,8 @@
 const Playlist = require("../models/Playlist");
 
-// @route   GET /api/playlists
-// @desc    Get all playlists owned by the authenticated user
-// @access  Private
+// GET /api/playlists
+// Get all playlists owned by the authenticated user
+// Private
 const getPlaylists = async (req, res) => {
   try {
     if (!req.user) {
@@ -21,9 +21,9 @@ const getPlaylists = async (req, res) => {
   }
 };
 
-// @route   GET /api/playlists/:id
-// @desc    Get a single playlist by ID
-// @access  Private
+// GET /api/playlists/:id
+// Get a single playlist by ID
+// Private
 const getPlaylistById = async (req, res) => {
   try {
     const playlist = await Playlist.findById(req.params.id).populate("songs");
@@ -39,9 +39,9 @@ const getPlaylistById = async (req, res) => {
   }
 };
 
-// @route   POST /api/playlists
-// @desc    Create a new playlist
-// @access  Private
+// POST /api/playlists
+// Create a new playlist
+// Private
 const createPlaylist = async (req, res) => {
   try {
     if (!req.user) {
@@ -71,9 +71,9 @@ const createPlaylist = async (req, res) => {
   }
 };
 
-// @route   PUT /api/playlists/:id
-// @desc    Update playlist info, privacy toggles, or manage songs
-// @access  Private
+// PUT /api/playlists/:id
+// Update playlist info, privacy toggles, or manage songs
+// Private
 const updatePlaylist = async (req, res) => {
   try {
     if (!req.user) {
@@ -117,9 +117,9 @@ const updatePlaylist = async (req, res) => {
   }
 };
 
-// @route   DELETE /api/playlists/:id
-// @desc    Delete a playlist by ID
-// @access  Private
+// DELETE /api/playlists/:id
+// Delete a playlist by ID
+// Private
 const deletePlaylist = async (req, res) => {
   try {
     if (!req.user) {

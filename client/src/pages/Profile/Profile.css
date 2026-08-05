@@ -1,12 +1,6 @@
-/* ==========================================
-   VIBEIFY PROFILE PAGE (CYBER-GLASS 2026)
-==========================================*/
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@600;700;800&display=swap');
 
-/* ==========================================
-   MAIN PAGE CONTAINER
-========================================== */
+/* MAIN PAGE CONTAINER */
 .profile-page {
   padding: 32px 40px 160px;
   max-width: 1200px;
@@ -53,9 +47,7 @@
   background: #ff4ecd;
 }
 
-/* ==========================================
-   HEADER CARD
-========================================== */
+/* HEADER CARD */
 
 .profile-header {
   position: relative;
@@ -157,9 +149,7 @@
   text-transform: uppercase;
 }
 
-/* ==========================================
-   GLASS PILL ICON STATS GRID
-========================================== */
+/* GLASS PILL ICON STATS GRID */
 
 .profile-stats {
   position: relative;
@@ -266,9 +256,7 @@
   font-weight: 600;
 }
 
-/* ==========================================
-   ACCOUNT INFORMATION CARD
-========================================== */
+/* ACCOUNT INFORMATION CARD */
 
 .profile-card {
   position: relative;
@@ -373,9 +361,7 @@
   font-size: 15px;
 }
 
-/* ==========================================
-   RESPONSIVE MOBILE OVERRIDES
-========================================== */
+/* RESPONSIVE MOBILE OVERRIDES */
 
 @media (max-width: 868px) {
   .profile-stats {
