@@ -1,33 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Added viewport-fit=cover for seamless edge-to-edge rendering on modern mobile displays -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
 
-    <!-- Primary Meta Tags -->
+    <!-- Primary SEO Meta Tags -->
     <title>Vibeify — Dynamic Cyber-Glass Audio Player</title>
     <meta name="title" content="Vibeify — Dynamic Cyber-Glass Audio Player" />
     <meta name="description" content="Stream your favorite tracks with dynamic lighting, equalizer presets, and a responsive glassmorphism UI." />
-    <meta name="keywords" content="music streaming, audio player, playlist app, glassmorphism UI, web music player" />
+    <meta name="keywords" content="music streaming, audio player, playlist app, glassmorphism UI, web music player, cyber aesthetics" />
     <meta name="author" content="Vibeify" />
     <meta name="theme-color" content="#0d0d12" />
     <link rel="canonical" href="https://vibeify-ashy.vercel.app/" />
 
-    <!-- Robots -->
-    <meta name="robots" content="index, follow" />
+    <!-- Search Engine Indexing -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
 
-    <!-- Favicon & App Icons -->
-    <link rel="icon" type="image/png" href="/vibeify-logo.png" />
+    <!-- Favicon & PWA Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/vibeify-logo.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/vibeify-logo.png" />
     <link rel="apple-touch-icon" href="https://vibeify-ashy.vercel.app/vibeify-logo.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Apple mobile web app support -->
+    <!-- Mobile Web App Capability -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Vibeify" />
 
-    <!-- Google Fonts Optimization -->
+    <!-- Font Optimization (Preconnect + Non-blocking display) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -35,28 +38,49 @@
       rel="stylesheet"
     />
 
-    <!-- Preload critical assets -->
-    <link rel="preload" as="image" href="/vibeify-logo.png" />
-
-    <!-- Open Graph / Social Media Sharing -->
-    <meta property="og:type" content="website" />
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="music.playlist" />
     <meta property="og:url" content="https://vibeify-ashy.vercel.app/" />
     <meta property="og:site_name" content="Vibeify" />
     <meta property="og:title" content="Vibeify — Cyber-Glass Audio Experience" />
     <meta property="og:description" content="Listen to curated playlists and customize your listening experience with dynamic themes." />
     <meta property="og:image" content="https://vibeify-ashy.vercel.app/vibeify-logo.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Twitter Meta Tags -->
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://vibeify-ashy.vercel.app/" />
-    <meta name="twitter:title" content="Vibeify" />
+    <meta name="twitter:title" content="Vibeify — Cyber-Glass Audio Player" />
     <meta name="twitter:description" content="Dynamic web audio player with customizable cyber aesthetics." />
     <meta name="twitter:image" content="https://vibeify-ashy.vercel.app/vibeify-logo.png" />
 
-    <!-- Structured Data (helps Google understand the app) -->
+    <!-- Inline Critical Styles (Prevents FOUC during JS hydration) -->
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg-theme: #0d0d12;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-theme);
+        color: #ffffff;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+
+    <!-- Schema.org Structured Data -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -65,22 +89,24 @@
         "url": "https://vibeify-ashy.vercel.app/",
         "description": "Stream your favorite tracks with dynamic lighting, equalizer presets, and a responsive glassmorphism UI.",
         "applicationCategory": "MusicApplication",
-        "operatingSystem": "Any browser"
+        "operatingSystem": "Any browser",
+        "browserRequirements": "Requires JavaScript and HTML5 Audio support."
       }
     </script>
   </head>
   <body>
-    <!-- React Root Mount Point -->
+    <!-- React Root Mount -->
     <div id="root"></div>
 
-    <!-- Fallback for users without JavaScript -->
+    <!-- Noscript Fallback -->
     <noscript>
-      <div style="padding: 40px; text-align: center; font-family: sans-serif; color: #fff; background: #0d0d12;">
-        Vibeify requires JavaScript to run. Please enable it in your browser settings.
+      <div style="padding: 40px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif; color: #f43f5e; background: #0d0d12; min-height: 100vh;">
+        <h2>JavaScript Required</h2>
+        <p style="color: #94a3b8;">Vibeify requires JavaScript to run the audio player engine. Please enable JavaScript in your browser settings.</p>
       </div>
     </noscript>
 
-    <!-- Application Entry Module -->
+    <!-- Application Entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
