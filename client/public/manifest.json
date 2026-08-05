@@ -1,0 +1,16 @@
+{
+  "name": "Vibeify — Dynamic Cyber-Glass Audio Player",
+  "short_name": "Vibeify",
+  "description": "Stream your favorite tracks with a responsive glassmorphism UI.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d12",
+  "theme_color": "#0d0d12",
+  "icons": [
+    {
+      "src": "/vibeify-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
