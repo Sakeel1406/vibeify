@@ -13,8 +13,10 @@ const app = express();
 // ⚡ CRITICAL FOR RATE LIMITING ON RENDER / VERCEL:
 app.set("trust proxy", 1);
 
+// Added localhost:5174 to the allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174", // <-- ADDED THIS LINE
   "http://localhost:3000",
   "https://vibeify-ashy.vercel.app",
   process.env.CLIENT_URL,
@@ -37,7 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-//  Skip rate limiting for Auth routes and general song fetches so users can log in freely!
+// Skip rate limiting for Auth routes and general song fetches so users can log in freely!
 app.use("/api", (req, res, next) => {
   // Skip global rate limiter for login/signup and main song browsing
   if (req.path.startsWith("/auth") || (req.method === "GET" && req.path === "/songs")) {

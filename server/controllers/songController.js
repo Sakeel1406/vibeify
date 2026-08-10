@@ -12,6 +12,7 @@ const getSongs = async (req, res) => {
           { title: { $regex: search, $options: "i" } },
           { artist: { $regex: search, $options: "i" } },
           { album: { $regex: search, $options: "i" } },
+          { category: { $regex: search, $options: "i" } }, // 👈 Added category to search
         ],
       };
     }
@@ -44,7 +45,8 @@ const getSongById = async (req, res) => {
 
 const createSong = async (req, res) => {
   try {
-    const { title, artist, album, duration } = req.body;
+    // 👈 Extract category and genre from req.body
+    const { title, artist, album, duration, category, genre } = req.body;
 
     if (!req.files || !req.files.audio) {
       return res.status(400).json({ message: "Audio file is required" });
@@ -57,6 +59,8 @@ const createSong = async (req, res) => {
       title,
       artist,
       album: album || "Single",
+      category: category || "General", // 👈 SAVE CATEGORY
+      genre: genre || "General",       // 👈 SAVE GENRE
       duration: duration || 0,
       songUrl: audioUrl,
       coverImage: imageUrl,
