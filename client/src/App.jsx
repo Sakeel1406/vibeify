@@ -1,14 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Context
+// Context Providers
 import { AuthProvider } from "./context/AuthContext";
+import { SettingsProvider } from "./context/SettingsContext"; // Imported SettingsProvider
 import { PlayerProvider } from "./context/PlayerContext";
+import { ToastProvider } from "./context/ToastContext";
 
-// Layout
+// Layout Shell
 import Layout from "./layouts/Layout";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import StreamingLimitModal from "./components/StreamingLimitModal/StreamingLimitModal";
 
 // Pages
 import Home from "./pages/Home/Home";
@@ -22,44 +25,73 @@ import Profile from "./pages/Profile/Profile";
 import Admin from "./pages/Admin/Admin";
 import NowPlaying from "./pages/NowPlaying/NowPlaying";
 import Settings from "./pages/Settings/Settings";
+import TopSongs from "./pages/TopSongs/TopSongs";
+import Albums from "./pages/Albums/Albums";
+import AlbumDetails from "./pages/AlbumDetails/AlbumDetails";
 
 import "./App.css";
 
 function App() {
   return (
     <AuthProvider>
-      <PlayerProvider>
-        <Routes>
-          {/* Standalone Auth Routes (Render without Sidebar/Navbar/Player) */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+      <SettingsProvider> {/* Wrapped around the rest of the app */}
+        <ToastProvider>
+          <PlayerProvider>
+            <StreamingLimitModal />
 
-          {/* Main Application Shell Routes (Wrapped in Layout) */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/now-playing" element={<NowPlaying />} />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/playlist/:id"
-              element={
-                <ProtectedRoute>
-                  <PlaylistDetails />
-                </ProtectedRoute>
-              }
-            />
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/library" element={<Library />} />
+                <Route path="/top-songs" element={<TopSongs />} />
+                <Route path="/albums" element={<Albums />} />
+                <Route path="/album/:name" element={<AlbumDetails />} />
+                <Route path="/now-playing" element={<NowPlaying />} />
 
-            {/* Fallback Catch-All */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
-      </PlayerProvider>
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <Admin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/playlist/:id"
+                  element={
+                    <ProtectedRoute>
+                      <PlaylistDetails />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+            </Routes>
+          </PlayerProvider>
+        </ToastProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 }

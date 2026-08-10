@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { FaGlobe, FaLock, FaTimes } from "react-icons/fa";
+import { useToast } from "../../context/ToastContext";
+import { useSettings } from "../../context/SettingsContext"; // 👈 Import Settings
 import "./CreatePlaylistModal.css";
 
 export default function CreatePlaylistModal({
@@ -10,15 +12,23 @@ export default function CreatePlaylistModal({
 }) {
   const [playlistName, setPlaylistName] = useState(initialValue || "");
   const [isPublic, setIsPublic] = useState(true);
+  const { showToast } = useToast();
+  
+  // Extract translation function and dynamic theme
+  const { t, theme } = useSettings();
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!playlistName.trim()) return;
+    const formattedName = playlistName.trim();
+    if (!formattedName) return;
 
     // Send payload object to parent component
-    onSubmit({ name: playlistName.trim(), isPublic });
+    onSubmit({ name: formattedName, isPublic });
+
+    // Trigger Cyber Toast Notification
+    showToast(`Playlist "${formattedName}" ${t("playlistCreatedToast")}`, "success");
 
     // Reset state & close
     setPlaylistName("");
@@ -27,7 +37,8 @@ export default function CreatePlaylistModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    // Apply dynamic theme class wrapper
+    <div className={`modal-overlay theme-${theme}`} onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Scanline Background FX */}
         <div className="scanline-overlay" />
@@ -36,13 +47,13 @@ export default function CreatePlaylistModal({
         <div className="modal-top-bar">
           <div className="status-indicator">
             <span className="status-dot" />
-            <span className="status-text">VIBEZ</span>
+            <span className="status-text">{t("vibesLabel")}</span>
           </div>
           <button
             type="button"
             className="modal-close-btn"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t("close")}
           >
             <FaTimes />
           </button>
@@ -50,8 +61,8 @@ export default function CreatePlaylistModal({
 
         {/* Modal Header */}
         <div className="modal-header">
-          <h3 className="modal-title">New Playlist</h3>
-          <p className="modal-subtitle">Synthesize a brand new track collection</p>
+          <h3 className="modal-title">{t("newPlaylistModalTitle")}</h3>
+          <p className="modal-subtitle">{t("synthesizeSubtitle")}</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -68,27 +79,27 @@ export default function CreatePlaylistModal({
             </div>
 
             <span className="art-title">
-              {playlistName.trim() || "Untitled Playlist"}
+              {playlistName.trim() || t("untitledPlaylist")}
             </span>
           </div>
 
           {/* Form Body Controls */}
           <div className="modal-body">
             <div className="form-group">
-              <label className="modal-label">Title</label>
+              <label className="modal-label">{t("titleLabel")}</label>
               <input
                 type="text"
                 className="modal-input"
                 value={playlistName}
                 onChange={(e) => setPlaylistName(e.target.value)}
-                placeholder="Enter title (e.g. Cyberpunk Nights)"
+                placeholder={t("enterTitlePlaceholder")}
                 autoFocus
               />
             </div>
 
             {/* Public / Private Privacy Selector */}
             <div className="privacy-selector">
-              <label className="modal-label">Privacy Setting</label>
+              <label className="modal-label">{t("privacySettingLabel")}</label>
               <div className="privacy-options">
                 <button
                   type="button"
@@ -96,7 +107,7 @@ export default function CreatePlaylistModal({
                   onClick={() => setIsPublic(true)}
                 >
                   <FaGlobe className="icon" />
-                  <span>Public</span>
+                  <span>{t("public")}</span>
                 </button>
 
                 <button
@@ -105,7 +116,7 @@ export default function CreatePlaylistModal({
                   onClick={() => setIsPublic(false)}
                 >
                   <FaLock className="icon" />
-                  <span>Private</span>
+                  <span>{t("private")}</span>
                 </button>
               </div>
             </div>
@@ -118,14 +129,14 @@ export default function CreatePlaylistModal({
               className="btn-secondary"
               onClick={onClose}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               className="btn-primary"
               disabled={!playlistName.trim()}
             >
-              Create Playlist
+              {t("createPlaylist")}
             </button>
           </div>
         </form>

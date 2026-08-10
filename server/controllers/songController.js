@@ -1,9 +1,6 @@
 const Song = require("../models/Song");
 const User = require("../models/User");
 
-// Get all songs (with optional search filter)
-// GET /api/songs
-// Public
 const getSongs = async (req, res) => {
   try {
     const { search } = req.query;
@@ -26,9 +23,15 @@ const getSongs = async (req, res) => {
   }
 };
 
-// Get single song by ID
-// GET /api/songs/:id
-// Public
+const getTopSongs = async (req, res) => {
+  try {
+    const topSongs = await Song.find({}).sort({ createdAt: -1 }).limit(20);
+    res.json(topSongs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getSongById = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -39,9 +42,6 @@ const getSongById = async (req, res) => {
   }
 };
 
-// Create/Upload a new song to Cloudinary
-// POST /api/songs
-// Private/Admin
 const createSong = async (req, res) => {
   try {
     const { title, artist, album, duration } = req.body;
@@ -50,7 +50,6 @@ const createSong = async (req, res) => {
       return res.status(400).json({ message: "Audio file is required" });
     }
 
-    // Retrieve Cloudinary secure URLs from req.files
     const audioUrl = req.files.audio[0].path;
     const imageUrl = req.files.image ? req.files.image[0].path : "";
 
@@ -59,10 +58,10 @@ const createSong = async (req, res) => {
       artist,
       album: album || "Single",
       duration: duration || 0,
-      songUrl: audioUrl,     // Cloudinary CDN link
-      coverImage: imageUrl,  // Cloudinary CDN link
-      audio: audioUrl,       // Fallback for frontend field reference
-      image: imageUrl,       // Fallback for frontend field reference
+      songUrl: audioUrl,
+      coverImage: imageUrl,
+      audio: audioUrl,
+      image: imageUrl,
     });
 
     res.status(201).json({
@@ -74,9 +73,6 @@ const createSong = async (req, res) => {
   }
 };
 
-// Delete song from Database
-// DELETE /api/songs/:id
-// Private/Admin
 const deleteSong = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -89,9 +85,6 @@ const deleteSong = async (req, res) => {
   }
 };
 
-// Toggle like / unlike song
-// PUT /api/songs/:id/like
-// Private
 const toggleLikeSong = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -112,9 +105,6 @@ const toggleLikeSong = async (req, res) => {
   }
 };
 
-// Get user's liked songs
-// GET /api/songs/liked/me
-// Private
 const getLikedSongs = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("likedSongs");
@@ -124,28 +114,27 @@ const getLikedSongs = async (req, res) => {
   }
 };
 
-// Record played song in history
-// POST /api/songs/:id/play
-// Private
 const recordPlay = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
     const songId = req.params.id;
 
-    user.recentlyPlayed = user.recentlyPlayed.filter((id) => id.toString() !== songId);
-    user.recentlyPlayed.unshift(songId);
-    user.recentlyPlayed = user.recentlyPlayed.slice(0, 20);
+    if (req.user && req.user._id) {
+      const user = await User.findById(req.user._id);
+      if (user) {
+        user.recentlyPlayed = user.recentlyPlayed.filter((id) => id.toString() !== songId);
+        user.recentlyPlayed.unshift(songId);
+        user.recentlyPlayed = user.recentlyPlayed.slice(0, 20);
+        await user.save();
+        return res.json({ recentlyPlayed: user.recentlyPlayed });
+      }
+    }
 
-    await user.save();
-    res.json({ recentlyPlayed: user.recentlyPlayed });
+    res.json({ success: true, message: "Play recorded for guest stream" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get user's recently played songs
-// GET /api/songs/recent/me
-// Private
 const getRecentlyPlayed = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("recentlyPlayed");
@@ -157,6 +146,7 @@ const getRecentlyPlayed = async (req, res) => {
 
 module.exports = {
   getSongs,
+  getTopSongs,
   getSongById,
   createSong,
   deleteSong,

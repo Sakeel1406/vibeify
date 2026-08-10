@@ -14,7 +14,6 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Dynamic count directly from Playlist model using userId
     const playlistsCount = await Playlist.countDocuments({ userId: userId });
 
     res.json({
@@ -29,6 +28,44 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+// Update user profile (Username/Details)
+// PUT /api/users/profile
+// Private
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const { username } = req.body;
+
+    if (!username || !username.trim()) {
+      return res.status(400).json({ message: "Username cannot be empty" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username: username.trim() },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the full updated profile structure with live counts
+    const playlistsCount = await Playlist.countDocuments({ userId: userId });
+
+    res.json({
+      ...updatedUser.toObject(),
+      playlistsCreatedCount: playlistsCount,
+      likedSongsCount: updatedUser.likedSongs ? updatedUser.likedSongs.length : 0,
+      songsPlayedCount: updatedUser.recentlyPlayed ? updatedUser.recentlyPlayed.length : 0,
+    });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    res.status(500).json({ message: "Server error updating profile" });
+  }
+};
+
 module.exports = {
   getUserProfile,
+  updateUserProfile,
 };

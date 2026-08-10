@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaArrowRight } from "react-icons/fa";
+import { useToast } from "../../context/ToastContext"; //  Import useToast
 import logo from "../../assets/vibeify-logo.png";
 import "../Login/Login.css";
 
 const ForgotPassword = () => {
+  const { showToast } = useToast(); //  Destructure showToast hook
   const [email, setEmail] = useState("");
   const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
@@ -21,16 +23,27 @@ const ForgotPassword = () => {
       // Temporary simulated response
       await new Promise((res) => setTimeout(res, 1200));
 
+      const successText = "Password reset instructions have been sent to your email!";
+
       setStatusMsg({
         type: "success",
-        text: "Password reset instructions have been sent to your email!",
+        text: successText,
       });
+
+      //  Toast Notification on Success
+      showToast(successText, "success");
+
       setEmail("");
     } catch (err) {
+      const errorText = err.response?.data?.message || "Failed to process request.";
+
       setStatusMsg({
         type: "error",
-        text: err.response?.data?.message || "Failed to process request.",
+        text: errorText,
       });
+
+      //  Toast Notification on Failure
+      showToast(errorText, "error");
     } finally {
       setLoading(false);
     }

@@ -2,8 +2,8 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <!-- Added viewport-fit=cover for seamless edge-to-edge rendering on modern mobile displays -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <!-- Enhanced viewport with interactive-widget support for seamless mobile keyboard handling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover, interactive-widget=resizes-visual" />
     <meta name="color-scheme" content="dark" />
 
     <!-- Primary SEO Meta Tags -->
@@ -12,7 +12,7 @@
     <meta name="description" content="Stream your favorite tracks with dynamic lighting, equalizer presets, and a responsive glassmorphism UI." />
     <meta name="keywords" content="music streaming, audio player, playlist app, glassmorphism UI, web music player, cyber aesthetics" />
     <meta name="author" content="Vibeify" />
-    <meta name="theme-color" content="#0d0d12" />
+    <meta name="theme-color" content="#07070a" />
     <link rel="canonical" href="https://vibeify-ashy.vercel.app/" />
 
     <!-- Search Engine Indexing -->
@@ -30,9 +30,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Vibeify" />
 
-    <!-- Font Optimization (Preconnect + Non-blocking display) -->
+    <!-- Performance Domain Preconnect & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Font Optimization -->
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -57,12 +61,17 @@
     <meta name="twitter:description" content="Dynamic web audio player with customizable cyber aesthetics." />
     <meta name="twitter:image" content="https://vibeify-ashy.vercel.app/vibeify-logo.png" />
 
-    <!-- Inline Critical Styles (Prevents FOUC during JS hydration) -->
+    <!-- Inline Critical Styles & Custom Cross-Platform Scrollbars -->
     <style>
       :root {
         color-scheme: dark;
-        --bg-theme: #0d0d12;
+        --bg-theme: #07070a;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -71,12 +80,40 @@
         font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
       }
+
       #root {
         min-height: 100vh;
         min-height: 100dvh;
         display: flex;
         flex-direction: column;
+      }
+
+      /* Custom Modern Scrollbars for Desktop & Mobile Webkit */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(7, 7, 10, 0.5);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        transition: background 0.3s ease;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(139, 92, 246, 0.5);
+      }
+
+      /* Prevent mobile text inflation on orientation change */
+      html {
+        -webkit-text-size-adjust: 100%;
       }
     </style>
 
@@ -100,9 +137,9 @@
 
     <!-- Noscript Fallback -->
     <noscript>
-      <div style="padding: 40px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif; color: #f43f5e; background: #0d0d12; min-height: 100vh;">
+      <div style="padding: 40px; text-align: center; font-family: 'Plus Jakarta Sans', sans-serif; color: #ff4ecd; background: #07070a; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h2>JavaScript Required</h2>
-        <p style="color: #94a3b8;">Vibeify requires JavaScript to run the audio player engine. Please enable JavaScript in your browser settings.</p>
+        <p style="color: #94a3b8; max-width: 400px; margin-top: 10px;">Vibeify requires JavaScript to run the audio player engine. Please enable JavaScript in your browser settings.</p>
       </div>
     </noscript>
 

@@ -1,54 +1,69 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import Navbar from "../components/Navbar/Navbar";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Player from "../components/Player/Player";
+import { useToast } from "../context/ToastContext";
+import { useSettings } from "../context/SettingsContext"; // Import Settings
 
 import "./Layout.css";
 
-const Layout = () => {
+export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { showToast } = useToast();
+  
+  // Extract translation function and dynamic theme
+  const { t, theme } = useSettings();
 
   const handleCloseSidebar = useCallback(() => {
     setSidebarOpen(false);
   }, []);
 
-  // Auto-close mobile sidebar when location actually changes
+  const handleToggleSidebar = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
+  }, []);
+
+  // Auto-close mobile sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
-  // Handle 'Escape' key press to close sidebar
+  // 'Escape' key handler for sidebar drawer
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && sidebarOpen) {
         handleCloseSidebar();
+        showToast(t("sidebarClosed"), "info");
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [sidebarOpen, handleCloseSidebar]);
+  }, [sidebarOpen, handleCloseSidebar, showToast, t]);
 
-  // Prevent background scrolling on mobile when sidebar drawer is open
+  // Lock body scroll when mobile sidebar drawer is active
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
     } else {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     }
 
     return () => {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     };
   }, [sidebarOpen]);
 
   return (
-    <div className="app-shell">
+    //  Applied Theme dynamically here
+    <div className={`app-shell theme-${theme}`} role="region" aria-label={t("vibeifyAudioApp")}>
       <div className="app-body">
-        {/* Mobile Backdrop Overlay */}
+        {/* Mobile Glass Overlay */}
         <div
           className={`sidebar-overlay ${sidebarOpen ? "is-visible" : ""}`}
           onClick={handleCloseSidebar}
@@ -56,16 +71,14 @@ const Layout = () => {
           role="presentation"
         />
 
-        {/* Sidebar Component */}
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={handleCloseSidebar}
-        />
+        {/* Navigation Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={handleCloseSidebar} />
 
-        {/* Main Content Viewport */}
+        {/* Main Viewport Area */}
         <div className="main-content">
           <Navbar
-            onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+            onToggleSidebar={handleToggleSidebar}
+            onMenuClick={handleToggleSidebar}
             isSidebarOpen={sidebarOpen}
           />
 
@@ -79,6 +92,4 @@ const Layout = () => {
       <Player />
     </div>
   );
-};
-
-export default Layout;
+}

@@ -14,17 +14,26 @@
 }
 
 .playlist-privacy-badge.public {
-  background: rgba(168, 85, 247, 0.15);
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  color: #c084fc;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-secondary);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 .playlist-privacy-badge.private {
   background: rgba(255, 78, 205, 0.15);
-  border: 1px solid rgba(255, 78, 205, 0.4);
-  color: #ff4ecd;
-  box-shadow: 0 0 10px rgba(255, 78, 205, 0.2);
+  border: 1px solid var(--accent-secondary);
+  color: var(--accent-secondary);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.playlist-privacy-badge.interactive {
+  cursor: pointer;
+}
+
+.playlist-privacy-badge.interactive:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .badge-icon {

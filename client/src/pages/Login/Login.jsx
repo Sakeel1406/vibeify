@@ -8,11 +8,13 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext"; // Import useToast
 import logo from "../../assets/vibeify-logo.png";
 import "./Login.css";
 
 const Login = () => {
   const { login } = useAuth();
+  const { showToast } = useToast(); // Destructure showToast hook
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -29,12 +31,20 @@ const Login = () => {
 
     try {
       await login(email, password, rememberMe);
+      
+      // Success Toast Notification
+      showToast("Welcome back to Vibeify! 🎵", "success");
+      
       navigate("/");
     } catch (err) {
-      setError(
+      const errorMsg =
         err.response?.data?.message ||
-          "Login failed. Please check your credentials."
-      );
+        "Login failed. Please check your credentials.";
+
+      setError(errorMsg);
+      
+      // Error Toast Notification
+      showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   FaChevronLeft,
   FaChevronRight,
-  FaSearch,
   FaUserCircle,
   FaSignOutAlt,
   FaCog,
@@ -11,168 +10,141 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { useSettings } from "../../context/SettingsContext"; // Import Settings
+import SearchOverlay from "../SearchOverlay/SearchOverlay";
 import "./Navbar.css";
 
-const Navbar = ({ onToggleSidebar }) => {
+const Navbar = ({
+  onToggleSidebar,
+  songList = [],
+  trendingData = [],
+  onSelectSong,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
+  
+  //  Extract translation function and dynamic theme
+  const { t, theme } = useSettings();
+
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+
   const menuRef = useRef(null);
+  const toggleBtnRef = useRef(null);
 
-  // Sync search input with URL query params
+  // Auto-close dropdown menu when route changes
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const query = params.get("q");
-    if (query) {
-      setSearchTerm(query);
-    }
-  }, [location.search]);
+    setMenuOpen(false);
+  }, [location.pathname]);
 
-  // Close profile menu on outside click or Escape key press
+  // Handle click outside of user dropdown menu
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        toggleBtnRef.current &&
+        !toggleBtnRef.current.contains(event.target)
+      ) {
         setMenuOpen(false);
       }
     };
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setMenuOpen(false);
-      }
-    };
-
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    setSearchTerm(val);
-    if (location.pathname.startsWith("/search")) {
-      navigate(`/search?q=${encodeURIComponent(val)}`, { replace: true });
-    }
-  };
-
   const handleLogout = () => {
-    logout();
     setMenuOpen(false);
-    navigate("/login");
+    logout();
+    showToast(t("logoutSuccessToast"), "info");
+    navigate("/");
   };
 
   return (
-    <nav className="navbar" aria-label="Main Navigation">
-      {/* Navigation Controls & Search Bar */}
+    //  Apply dynamic theme class wrapper
+    <header className={`vibe-navbar theme-${theme}`}>
       <div className="navbar-left">
-        {/* Mobile Hamburger Drawer Button */}
+        {/* Toggle Sidebar Button */}
         <button
-          className="mobile-menu-btn"
+          className="sidebar-toggle-btn"
           onClick={onToggleSidebar}
-          aria-label="Toggle navigation menu"
+          aria-label="Toggle Sidebar"
         >
           <FaBars />
         </button>
 
-        <div className="nav-arrows">
+        {/* History Navigation Buttons */}
+        <div className="nav-history-buttons">
           <button
-            className="nav-arrow"
+            className="nav-btn"
             onClick={() => navigate(-1)}
-            aria-label="Go back"
+            title={t("goBackTitle")}
+            aria-label={t("goBackTitle")}
           >
             <FaChevronLeft />
           </button>
           <button
-            className="nav-arrow"
+            className="nav-btn"
             onClick={() => navigate(1)}
-            aria-label="Go forward"
+            title={t("goForwardTitle")}
+            aria-label={t("goForwardTitle")}
           >
             <FaChevronRight />
           </button>
         </div>
 
-        {location.pathname.startsWith("/search") && (
-          <form className="navbar-search" onSubmit={handleSearchSubmit}>
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="What do you want to play?"
-              value={searchTerm}
-              onChange={handleInputChange}
-              aria-label="Search music"
-            />
-          </form>
-        )}
+        {/* Central Search Overlay Bar */}
+        <div className="navbar-search-wrapper">
+          <SearchOverlay
+            songList={songList}
+            trendingData={trendingData}
+            onSelectSong={onSelectSong}
+          />
+        </div>
       </div>
 
-      {/* User Actions & Dropdown */}
       <div className="navbar-right">
         {user ? (
-          <div className="user-menu" ref={menuRef}>
+          <div className="user-profile-wrapper">
             <button
-              className={`user-pill ${menuOpen ? "active" : ""}`}
-              onClick={() => setMenuOpen((o) => !o)}
-              aria-haspopup="true"
-              aria-expanded={menuOpen}
-              aria-label="User account menu"
+              ref={toggleBtnRef}
+              className="user-avatar-btn"
+              onClick={() => setMenuOpen((prev) => !prev)}
             >
-              <FaUserCircle className="user-avatar-icon" />
-              <span>{user.username}</span>
+              <FaUserCircle className="user-icon" />
+              <span className="username-text">
+                {user.name || user.username || t("accountLabel")}
+              </span>
             </button>
 
             {menuOpen && (
-              <div className="dropdown" role="menu">
-                <Link
-                  to="/profile"
-                  onClick={() => setMenuOpen(false)}
-                  role="menuitem"
-                  className={location.pathname === "/profile" ? "active-link" : ""}
-                >
-                  <FaUser className="dropdown-icon" /> Profile
+              <div ref={menuRef} className="user-dropdown-menu">
+                <Link to="/profile" className="menu-item">
+                  <FaUser /> {t("Profile")}
                 </Link>
-                <Link
-                  to="/settings"
-                  onClick={() => setMenuOpen(false)}
-                  role="menuitem"
-                  className={location.pathname === "/settings" ? "active-link" : ""}
-                >
-                  <FaCog className="dropdown-icon" /> Settings
+                <Link to="/settings" className="menu-item">
+                  <FaCog /> {t("settings")}
                 </Link>
-                <div className="dropdown-divider" />
-                <button 
-                  onClick={handleLogout} 
-                  role="menuitem" 
-                  className="logout-btn"
-                >
-                  <FaSignOutAlt className="dropdown-icon logout-icon" /> Log out
+                <button onClick={handleLogout} className="menu-item logout-btn">
+                  <FaSignOutAlt /> {t("logoutLabel")}
                 </button>
               </div>
             )}
           </div>
         ) : (
           <div className="auth-buttons">
-            <Link to="/register" className="btn-outline">
-              Sign up
+            <Link to="/register" className="auth-btn signup-btn">
+              {t("topSignUp")}
             </Link>
-            <Link to="/login" className="btn-solid">
-              Log in
+            <Link to="/login" className="auth-btn login-btn">
+              {t("topLogIn")}
             </Link>
           </div>
         )}
       </div>
-    </nav>
+    </header>
   );
 };
 

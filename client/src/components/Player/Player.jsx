@@ -13,8 +13,10 @@ import {
   FaRegHeart,
   FaExpandAlt,
 } from "react-icons/fa";
-import { useMusic } from "../../context/MusicContext";
+import { useMusic } from "../../context/PlayerContext";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext"; 
+import { useSettings } from "../../context/SettingsContext"; // Import Settings
 import { toggleLikeSong, getLikedSongs } from "../../services/api";
 import "./Player.css";
 
@@ -31,6 +33,11 @@ const Player = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast(); 
+  
+  //  Extract translation function and dynamic theme
+  const { t, theme } = useSettings();
+
   const {
     currentSong,
     isPlaying,
@@ -63,19 +70,45 @@ const Player = () => {
     e.stopPropagation();
     if (!user || !currentSong) return;
     toggleLikeSong(currentSong._id);
+    const newLikedState = !isLiked;
     setLikedIds((prev) =>
-      prev.includes(currentSong._id)
-        ? prev.filter((id) => id !== currentSong._id)
-        : [...prev, currentSong._id]
+      newLikedState
+        ? [...prev, currentSong._id]
+        : prev.filter((id) => id !== currentSong._id)
     );
+    showToast(
+      newLikedState
+        ? t("addedToLikedSongs")
+        : t("removedFromLikedSongs"),
+      newLikedState ? "success" : "info"
+    );
+  };
+
+  const handleShuffleToggle = () => {
+    const nextShuffle = !shuffle;
+    setShuffle(nextShuffle);
+    showToast(nextShuffle ? t("shuffleEnabled") : t("shuffleDisabled"), "info");
+  };
+
+  const handleRepeatToggle = () => {
+    const nextRepeat = !repeat;
+    setRepeat(nextRepeat);
+    showToast(nextRepeat ? t("repeatEnabled") : t("repeatDisabled"), "info");
+  };
+
+  const handleVolumeChange = (newVol) => {
+    setVolume(newVol);
+    if (newVol === 0) {
+      showToast(t("audioMuted"), "info");
+    }
   };
 
   if (!currentSong) {
     return (
-      <footer className="player-wrapper player-empty-wrap">
+      <footer className={`player-wrapper player-empty-wrap theme-${theme}`}>
         <div className="player player-empty">
           <span className="empty-pulse" />
-          <span>Select a vibe to ignite audio</span>
+          <span>{t("selectVibePrompt")}</span>
         </div>
       </footer>
     );
@@ -85,9 +118,9 @@ const Player = () => {
   const volumePercent = volume * 100;
 
   return (
-    <div className="player-wrapper">
+    // 👈 Apply theme class wrapper
+    <div className={`player-wrapper theme-${theme}`}>
       <footer className="player">
-        {/* Dynamic Mobile Micro-Progress Bar */}
         <div className="mobile-top-progress">
           <div
             className="mobile-progress-fill"
@@ -95,7 +128,6 @@ const Player = () => {
           />
         </div>
 
-        {/* Left: Track Info & Live EQ */}
         <div className="player-left" onClick={() => navigate("/now-playing")}>
           <div className="player-art-wrap">
             <img
@@ -121,10 +153,10 @@ const Player = () => {
 
           {user && (
             <button
-              className="icon-btn like-btn"
+              className={`icon-btn like-btn ${isLiked ? "liked-active" : ""}`}
               onClick={handleLike}
-              title="Like song"
-              aria-label="Like song"
+              title={t("likeSongTitle")}
+              aria-label={t("likeSongTitle")}
             >
               {isLiked ? (
                 <FaHeart color="#ff4ecd" className="liked" />
@@ -135,22 +167,21 @@ const Player = () => {
           )}
         </div>
 
-        {/* Center: Playback Controls & Cyber Progress Bar */}
         <div className="player-center">
           <div className="player-controls">
             <button
-              className={`icon-btn ${shuffle ? "active" : ""}`}
-              onClick={() => setShuffle((s) => !s)}
-              title="Shuffle"
-              aria-label="Shuffle"
+              className={`icon-btn toggle-btn ${shuffle ? "active" : ""}`}
+              onClick={handleShuffleToggle}
+              title={t("shuffleTooltip")}
+              aria-label={t("shuffleTooltip")}
             >
               <FaRandom />
             </button>
             <button
               className="icon-btn"
               onClick={prevSong}
-              title="Previous"
-              aria-label="Previous track"
+              title={t("prevSongTooltip")}
+              aria-label={t("previousTrackAria")}
             >
               <FaStepBackward />
             </button>
@@ -160,8 +191,8 @@ const Player = () => {
                 e.stopPropagation();
                 togglePlay();
               }}
-              title={isPlaying ? "Pause" : "Play"}
-              aria-label="Play or Pause"
+              title={isPlaying ? t("pauseTooltip") : t("playTooltip")}
+              aria-label={t("playPauseAria")}
             >
               {isPlaying ? (
                 <FaPause />
@@ -172,16 +203,16 @@ const Player = () => {
             <button
               className="icon-btn"
               onClick={nextSong}
-              title="Next"
-              aria-label="Next track"
+              title={t("nextSongTooltip")}
+              aria-label={t("nextTrackAria")}
             >
               <FaStepForward />
             </button>
             <button
-              className={`icon-btn ${repeat ? "active" : ""}`}
-              onClick={() => setRepeat((r) => !r)}
-              title="Repeat"
-              aria-label="Repeat"
+              className={`icon-btn toggle-btn ${repeat ? "active" : ""}`}
+              onClick={handleRepeatToggle}
+              title={t("repeatTooltip")}
+              aria-label={t("repeatTooltip")}
             >
               <FaRedo />
             </button>
@@ -198,7 +229,7 @@ const Player = () => {
                 onChange={(e) => seekTo(Number(e.target.value))}
                 className="progress-bar"
                 style={{
-                  background: `linear-gradient(to right, #8b5cf6 0%, #ff4ecd ${progressPercent}%, rgba(255, 255, 255, 0.08) ${progressPercent}%, rgba(255, 255, 255, 0.08) 100%)`,
+                  background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-secondary) ${progressPercent}%, rgba(255, 255, 255, 0.08) ${progressPercent}%, rgba(255, 255, 255, 0.08) 100%)`,
                 }}
               />
             </div>
@@ -206,14 +237,13 @@ const Player = () => {
           </div>
         </div>
 
-        {/* Right: Capsule Volume & Expansion */}
         <div className="player-right">
           <div className="volume-capsule">
             <button
               className="icon-btn vol-icon"
-              onClick={() => setVolume(volume > 0 ? 0 : 0.8)}
-              title="Mute / Unmute"
-              aria-label="Toggle mute"
+              onClick={() => handleVolumeChange(volume > 0 ? 0 : 0.8)}
+              title={t("muteTooltip")}
+              aria-label={t("toggleMuteAria")}
             >
               {volume > 0 ? <FaVolumeUp /> : <FaVolumeMute />}
             </button>
@@ -223,10 +253,10 @@ const Player = () => {
               max="1"
               step="0.01"
               value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
+              onChange={(e) => handleVolumeChange(Number(e.target.value))}
               className="volume-bar"
               style={{
-                background: `linear-gradient(to right, #8b5cf6 0%, #ff4ecd ${volumePercent}%, rgba(255, 255, 255, 0.1) ${volumePercent}%, rgba(255, 255, 255, 0.1) 100%)`,
+                background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-secondary) ${volumePercent}%, rgba(255, 255, 255, 0.1) ${volumePercent}%, rgba(255, 255, 255, 0.1) 100%)`,
               }}
             />
           </div>
@@ -235,15 +265,14 @@ const Player = () => {
             <button
               className="icon-btn expand-btn"
               onClick={() => navigate("/now-playing")}
-              title="Expand Player"
-              aria-label="Expand player view"
+              title={t("expandPlayerTooltip")}
+              aria-label={t("expandPlayerAria")}
             >
               <FaExpandAlt />
             </button>
           )}
         </div>
 
-        {/* Mobile Quick Action Buttons */}
         <div className="mobile-right-controls">
           <button
             className={`play-btn mobile-play-btn ${
@@ -253,7 +282,7 @@ const Player = () => {
               e.stopPropagation();
               togglePlay();
             }}
-            aria-label="Play or Pause"
+            aria-label={t("playPauseAria")}
           >
             {isPlaying ? (
               <FaPause />

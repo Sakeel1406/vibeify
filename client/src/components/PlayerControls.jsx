@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
+import { useSettings } from '../context/SettingsContext'; // Import Global Settings
 
 export default function PlayerControls({ songList = [], currentIndex = 0 }) {
   const { playSong, isPlaying, setIsPlaying } = usePlayer();
+  const { t } = useSettings(); // Extract translation function
 
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
@@ -14,7 +16,7 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
 
     const success = playSong(targetSong);
     if (!success) {
-      console.warn("Guest streaming limit reached. Registration modal triggered.");
+      console.warn(t("guestLimitWarning"));
     }
   };
 
@@ -65,12 +67,16 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
       <button
         onClick={() => setIsShuffle(!isShuffle)}
         className={`p-2 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
-          isShuffle 
-            ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]' 
-            : 'text-gray-400 hover:text-white hover:bg-white/5'
+          !isShuffle ? 'text-gray-400 hover:text-white hover:bg-white/5' : ''
         }`}
-        title="Shuffle"
-        aria-label="Toggle Shuffle"
+        style={isShuffle ? { 
+          color: 'var(--accent-primary)', 
+          backgroundColor: 'var(--accent-glow)', 
+          borderColor: 'var(--accent-primary)',
+          borderWidth: '1px'
+        } : {}}
+        title={t("shuffleTooltip")}
+        aria-label={t("toggleShuffleAria")}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h2m8 0h2a2 2 0 012 2v8a2 2 0 01-2 2h-2m-8 0l4-4m0 0l-4-4m4 4H4m16 0l-4-4m0 0l4-4m-4 4h4" />
@@ -81,8 +87,8 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
       <button
         onClick={handlePrev}
         className="p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-        title="Previous Song"
-        aria-label="Previous Song"
+        title={t("prevSongTooltip")}
+        aria-label={t("prevSongTooltip")}
       >
         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
@@ -92,9 +98,13 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
       {/* Play / Pause Toggle Button */}
       <button
         onClick={handleTogglePlay}
-        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all"
-        title={isPlaying ? "Pause" : "Play"}
-        aria-label={isPlaying ? "Pause Track" : "Play Track"}
+        className="flex h-11 w-11 items-center justify-center rounded-2xl text-white shadow-lg hover:scale-105 active:scale-95 transition-all"
+        style={{ 
+          background: 'var(--accent-gradient)', 
+          boxShadow: '0 4px 14px var(--accent-glow)' 
+        }}
+        title={isPlaying ? t("pauseTooltip") : t("playTooltip")}
+        aria-label={isPlaying ? t("pauseTrackAria") : t("playTrackAria")}
       >
         {isPlaying ? (
           <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -111,8 +121,8 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
       <button
         onClick={handleNext}
         className="p-2.5 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-        title="Next Song"
-        aria-label="Next Song"
+        title={t("nextSongTooltip")}
+        aria-label={t("nextSongTooltip")}
       >
         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
@@ -123,12 +133,16 @@ export default function PlayerControls({ songList = [], currentIndex = 0 }) {
       <button
         onClick={() => setIsRepeat(!isRepeat)}
         className={`p-2 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
-          isRepeat 
-            ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]' 
-            : 'text-gray-400 hover:text-white hover:bg-white/5'
+          !isRepeat ? 'text-gray-400 hover:text-white hover:bg-white/5' : ''
         }`}
-        title="Repeat"
-        aria-label="Toggle Repeat"
+        style={isRepeat ? { 
+          color: 'var(--accent-primary)', 
+          backgroundColor: 'var(--accent-glow)', 
+          borderColor: 'var(--accent-primary)',
+          borderWidth: '1px'
+        } : {}}
+        title={t("repeatTooltip")}
+        aria-label={t("toggleRepeatAria")}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
