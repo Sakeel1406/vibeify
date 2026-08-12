@@ -451,7 +451,7 @@ const SongsTab = () => {
       s.category?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const categories = ["Tamil", "English", "Malayalam", "Hindi", "Telugu", "Trending"];
+  const categories = ["Tamil", "English", "Malayalam", "Hindi", "Telugu", "Kannada", "Other"];
 
   return (
     <div>

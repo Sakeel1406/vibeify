@@ -112,7 +112,7 @@ const Home = () => {
     );
   });
 
-  const filterCategories = ["All", "Trending", "Tamil", "English", "Malayalam", "Hindi", "Telugu"];
+  const filterCategories = ["All", "Trending", "Tamil", "Telugu", "Malayalam", "Kannada", "Hindi", "English"];
 
   return (
     <div className={`home-page theme-${theme}`}>
