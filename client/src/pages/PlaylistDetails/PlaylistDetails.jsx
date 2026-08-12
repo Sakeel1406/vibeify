@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // 👈 Added useNavigate
 import { 
   FaPlay,
   FaPause,
@@ -8,7 +8,7 @@ import {
   FaPlus,
   FaClock,
 } from "react-icons/fa";
-import { getPlaylistById, updatePlaylist, getSongs } from "../../services/api";
+import { getPlaylistById, updatePlaylist, getSongs, deletePlaylist } from "../../services/api"; // 👈 Added deletePlaylist
 import { useMusic } from "../../context/PlayerContext";
 import { useToast } from "../../context/ToastContext";
 import { useSettings } from "../../context/SettingsContext";
@@ -16,6 +16,7 @@ import "./PlaylistDetails.css";
 
 const PlaylistDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // 👈 Initialize navigation
   const { currentSong, isPlaying, playSong, togglePlay } = useMusic();
   const { showToast } = useToast();
   
@@ -25,6 +26,9 @@ const PlaylistDetails = () => {
   const [allSongs, setAllSongs] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
+
+  // 👈 Modal State for Delete Confirmation
+  const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
     getPlaylistById(id)
@@ -85,6 +89,22 @@ const PlaylistDetails = () => {
     showToast(`${t("shufflePlayingPrefix")} "${playlist.name}" 🔀`, "success");
   };
 
+  // 👈 Handle Actual Playlist Deletion
+  const handleConfirmDelete = async () => {
+    try {
+      await deletePlaylist(id);
+      showToast(`"${playlist.name}" ${t("deletedPlaylistToast")}`, "info");
+      setDeleteModal(false);
+      
+      // Navigate safely back to library and REPLACE history so they can't hit 'Back' into a 404 error
+      navigate('/library', { replace: true }); 
+    } catch (err) {
+      console.error("Failed to delete playlist", err);
+      showToast(t("failedDeletePlaylist"), "error");
+      setDeleteModal(false);
+    }
+  };
+
   if (!playlist) {
     return (
       <div className={`playlist-page theme-${theme}`}>
@@ -116,7 +136,6 @@ const PlaylistDetails = () => {
         </div>
         <div className="playlist-info-content">
           <div className="playlist-type">{t("publicPlaylistType")}</div>
-          {/* Explicitly styled gradient text header for the playlist name */}
           <h1 style={{
             fontFamily: "'Outfit', sans-serif",
             fontSize: "clamp(32px, 4vw, 52px)",
@@ -168,6 +187,16 @@ const PlaylistDetails = () => {
           aria-label={t("addSongsBtn")}
         >
           <FaPlus />
+        </button>
+
+        {/* 👈 Added Delete Playlist Button to Toolbar */}
+        <button
+          className="action-icon-btn delete-playlist-toolbar-btn"
+          onClick={() => setDeleteModal(true)}
+          title={t("deletePlaylistTitle")}
+          aria-label={t("deletePlaylistTitle")}
+        >
+          <FaTrash />
         </button>
       </div>
 
@@ -264,6 +293,28 @@ const PlaylistDetails = () => {
           })
         )}
       </div>
+
+      {/* 👈 CUSTOM DELETE PLAYLIST MODAL */}
+      {deleteModal && (
+        <div className="vibeify-modal-overlay" onClick={() => setDeleteModal(false)}>
+          <div className="vibeify-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrapper">
+              <FaTrash className="modal-icon error-icon" />
+            </div>
+            <h3>{t("deletePlaylistModalTitle")}</h3>
+            <p>{t("deletePlaylistModalDesc")} <strong>"{playlist.name}"</strong>? {t("deletePlaylistModalDescSuffix")}</p>
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={() => setDeleteModal(false)}>
+                {t("cancel")}
+              </button>
+              <button className="modal-btn confirm" onClick={handleConfirmDelete}>
+                {t("deletePlaylistBtn")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

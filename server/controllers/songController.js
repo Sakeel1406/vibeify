@@ -12,7 +12,7 @@ const getSongs = async (req, res) => {
           { title: { $regex: search, $options: "i" } },
           { artist: { $regex: search, $options: "i" } },
           { album: { $regex: search, $options: "i" } },
-          { category: { $regex: search, $options: "i" } }, // 👈 Added category to search
+          { category: { $regex: search, $options: "i" } },
         ],
       };
     }
@@ -45,7 +45,6 @@ const getSongById = async (req, res) => {
 
 const createSong = async (req, res) => {
   try {
-    // 👈 Extract category and genre from req.body
     const { title, artist, album, duration, category, genre } = req.body;
 
     if (!req.files || !req.files.audio) {
@@ -59,8 +58,8 @@ const createSong = async (req, res) => {
       title,
       artist,
       album: album || "Single",
-      category: category || "General", // 👈 SAVE CATEGORY
-      genre: genre || "General",       // 👈 SAVE GENRE
+      category: category || "General",
+      genre: genre || "General",
       duration: duration || 0,
       songUrl: audioUrl,
       coverImage: imageUrl,
@@ -148,6 +147,22 @@ const getRecentlyPlayed = async (req, res) => {
   }
 };
 
+const clearRecentlyPlayed = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.recentlyPlayed = [];
+    await user.save();
+
+    res.json({ message: "Recently played history cleared", recentlyPlayed: [] });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getSongs,
   getTopSongs,
@@ -158,4 +173,5 @@ module.exports = {
   getLikedSongs,
   recordPlay,
   getRecentlyPlayed,
+  clearRecentlyPlayed,
 };

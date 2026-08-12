@@ -27,6 +27,9 @@ const Library = () => {
   const [tab, setTab] = useState("playlists");
   const [loading, setLoading] = useState(true);
 
+  // Modal State for Delete Confirmation
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
+
   useEffect(() => {
     if (!user) return;
 
@@ -42,17 +45,29 @@ const Library = () => {
       .finally(() => setLoading(false));
   }, [user, showToast]);
 
-  const handleDeletePlaylist = async (id, playlistName, e) => {
+  // Open Modal instead of window.confirm
+  const handleDeleteClick = (id, playlistName, e) => {
     e.stopPropagation();
-    if (!window.confirm(`${t("deletePlaylistConfirm")} "${playlistName}"?`)) return;
+    setDeleteModal({ isOpen: true, id, name: playlistName });
+  };
 
+  // Close Modal
+  const handleCloseModal = () => {
+    setDeleteModal({ isOpen: false, id: null, name: "" });
+  };
+
+  // Actual Delete Action
+  const handleConfirmDelete = async () => {
+    const { id, name } = deleteModal;
     try {
       await deletePlaylist(id);
       setPlaylists((prev) => prev.filter((p) => p._id !== id));
-      showToast(`"${playlistName}" ${t("deletedPlaylistToast")}`, "info");
+      showToast(`"${name}" ${t("deletedPlaylistToast")}`, "info");
     } catch (err) {
       console.error("Failed to delete playlist", err);
       showToast(t("failedDeletePlaylist"), "error");
+    } finally {
+      handleCloseModal();
     }
   };
 
@@ -113,7 +128,7 @@ const Library = () => {
             className={`tab ${tab === "playlists" ? "active" : ""}`}
             onClick={() => setTab("playlists")}
           >
-            {/*  Custom Music Playlist SVG Icon */}
+            {/* Custom Music Playlist SVG Icon */}
             <svg
               className="tab-icon"
               viewBox="0 0 24 24"
@@ -133,7 +148,7 @@ const Library = () => {
             className={`tab ${tab === "liked" ? "active" : ""}`}
             onClick={() => setTab("liked")}
           >
-            {/*  Custom Heart with Headphones Icon for Tab */}
+            {/* Custom Heart with Headphones Icon for Tab */}
             <svg 
               className="tab-icon pink"
               viewBox="0 0 24 24" 
@@ -166,7 +181,7 @@ const Library = () => {
               {playlists.length === 0 ? (
                 <div className="library-empty-card">
                   <div className="empty-icon-wrap">
-                    {/* 🎵 Custom Music Playlist SVG Icon for Empty Playlists State */}
+                    {/* Custom Music Playlist SVG Icon for Empty Playlists State */}
                     <svg
                       viewBox="0 0 24 24"
                       width="36"
@@ -194,11 +209,11 @@ const Library = () => {
                         image={pl.coverImage || (pl.songs[0]?.image ?? "https://placehold.co/300x300/121218/ff4ecd?text=Vibeify")}
                         onClick={() => navigate(`/playlist/${pl._id}`)}
                       />
-
+                      {/* Trigger custom modal on click */}
                       <button
                         className="delete-playlist-btn"
                         title={t("deletePlaylistTitle")}
-                        onClick={(e) => handleDeletePlaylist(pl._id, pl.name, e)}
+                        onClick={(e) => handleDeleteClick(pl._id, pl.name, e)}
                       >
                         <FaTrash />
                       </button>
@@ -215,7 +230,7 @@ const Library = () => {
               {liked.length === 0 ? (
                 <div className="library-empty-card">
                   <div className="empty-icon-wrap pink">
-                    {/*  Custom Heart with Headphones Icon for Empty Liked State */}
+                    {/* Custom Heart with Headphones Icon for Empty Liked State */}
                     <svg 
                       viewBox="0 0 24 24" 
                       width="36"
@@ -245,6 +260,29 @@ const Library = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* CUSTOM DELETE PLAYLIST MODAL */}
+      {deleteModal.isOpen && (
+        <div className="vibeify-modal-overlay" onClick={handleCloseModal}>
+          <div className="vibeify-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrapper">
+              <FaTrash className="modal-icon error-icon" />
+            </div>
+            {/* 👈 Dynamic Translation added to Modal title */}
+            <h3>{t("deletePlaylistModalTitle")}</h3>
+            <p>{t("deletePlaylistModalDesc")} <strong>"{deleteModal.name}"</strong>? {t("deletePlaylistModalDescSuffix")}</p>
+            <div className="modal-actions">
+              {/* 👈 Dynamic Translation added to Modal buttons */}
+              <button className="modal-btn cancel" onClick={handleCloseModal}>
+                {t("cancel")}
+              </button>
+              <button className="modal-btn confirm" onClick={handleConfirmDelete}>
+                {t("deletePlaylistBtn")}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -41,7 +41,7 @@ export const getMe = () => api.get("/auth/me");
 
 // ---- Users ----
 export const getUserProfile = () => api.get("/users/profile");
-export const updateProfile = (data) => api.put("/users/profile", data); // 👈 Added updateProfile API export
+export const updateProfile = (data) => api.put("/users/profile", data); //  Added updateProfile API export
 
 // ---- Songs ----
 export const getSongs = (search = "") =>
@@ -59,9 +59,10 @@ export const deleteSong = (id) => api.delete(`/songs/${id}`);
 export const toggleLikeSong = (id) => api.put(`/songs/${id}/like`);
 export const getLikedSongs = () => api.get("/songs/liked/me");
 
-// ---- Stream Limit Tracking API ----
+// ---- Stream Limit Tracking & History API ----
 export const recordPlay = (id) => api.post(`/songs/${id}/play`);
 export const getRecentlyPlayed = () => api.get("/songs/recent/me");
+export const clearRecentlyPlayed = () => api.delete("/songs/recent/me"); // 👈 ADDED THIS
 
 // ---- Playlists ----
 export const getPlaylists = () => api.get("/playlists");

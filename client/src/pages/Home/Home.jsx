@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlay, FaFireAlt, FaMusic, FaHistory, FaCompass } from "react-icons/fa";
-import { getSongs, getRecentlyPlayed } from "../../services/api";
+import { FaPlay, FaFireAlt, FaMusic, FaHistory, FaCompass, FaTrash } from "react-icons/fa";
+import { getSongs, getRecentlyPlayed, clearRecentlyPlayed } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { useMusic } from "../../context/PlayerContext";
 import { useToast } from "../../context/ToastContext";
@@ -55,6 +55,9 @@ const Home = () => {
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
+  
+  //  Modal State
+  const [showClearModal, setShowClearModal] = useState(false);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -85,8 +88,28 @@ const Home = () => {
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
-    const displayFilterName = filter === "All" ? t("all") : t(`filter${filter}`);
+    const displayFilterName = filter === "All" 
+      ? t("all") 
+      : (t(`filter${filter}`) !== `filter${filter}` ? t(`filter${filter}`) : filter);
+    
     showToast(`Switched filter to [${displayFilterName}] vibe`, "info");
+  };
+
+  //  Updated Handlers for Custom Modal
+  const handleOpenClearModal = () => setShowClearModal(true);
+  const handleCloseClearModal = () => setShowClearModal(false);
+
+  const handleConfirmClearHistory = async () => {
+    try {
+      await clearRecentlyPlayed();
+      setRecent([]);
+      showToast("Recently played history cleared 🗑️", "info");
+    } catch (err) {
+      console.error("Clear history error:", err);
+      showToast("Failed to clear listening history", "error");
+    } finally {
+      setShowClearModal(false); // Close modal after action
+    }
   };
 
   const heroSong = songs[0];
@@ -204,6 +227,16 @@ const Home = () => {
               <h2 className="vibrant-section-title">
                 <FaHistory className="section-title-icon history-spin" /> {t("recentlyPlayed")}
               </h2>
+              {/*  Open Modal instead of window.confirm */}
+              <button 
+                type="button" 
+                className="clear-history-btn" 
+                onClick={handleOpenClearModal}
+                title={t("clearHistoryBtn")}
+              >
+                <FaTrash className="clear-btn-icon" />
+                <span>{t("clear")}</span>
+              </button>
             </div>
             <div className="song-grid">
               {recent.map((song) => (
@@ -229,7 +262,9 @@ const Home = () => {
                   onClick={() => handleFilterChange(filter)}
                 >
                   <span className="chip-bg-glow" />
-                  {filter === "All" ? t("all") : t(`filter${filter}`)}
+                  {filter === "All" 
+                    ? t("all") 
+                    : (t(`filter${filter}`) !== `filter${filter}` ? t(`filter${filter}`) : filter)}
                 </button>
               ))}
             </div>
@@ -277,6 +312,28 @@ const Home = () => {
           </button>
         </div>
       )}
+
+      {/*  CUSTOM CLEAR HISTORY MODAL */}
+      {showClearModal && (
+        <div className="vibeify-modal-overlay" onClick={handleCloseClearModal}>
+          <div className="vibeify-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrapper">
+              <FaTrash className="modal-icon error-icon" />
+            </div>
+            <h3>{t("clearHistoryTitle")}</h3>
+            <p>{t("clearHistoryDesc")}</p>
+            <div className="modal-actions">
+              <button className="modal-btn cancel" onClick={handleCloseClearModal}>
+                {t("cancel")}
+              </button>
+              <button className="modal-btn confirm" onClick={handleConfirmClearHistory}>
+                {t("clearHistoryBtn")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

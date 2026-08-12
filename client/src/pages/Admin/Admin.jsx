@@ -18,7 +18,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import { useSettings } from "../../context/SettingsContext"; //  Connect Global Settings
+import { useSettings } from "../../context/SettingsContext";
 import {
   getSongs,
   uploadSong,
@@ -36,7 +36,6 @@ const Admin = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
   
-  // Extract translation function and dynamic theme
   const { t, theme } = useSettings(); 
 
   const [tab, setTab] = useState("overview");
@@ -100,11 +99,9 @@ const Admin = () => {
   }
 
   return (
-    //  Applied Theme dynamically here
     <div className={`admin-page theme-${theme}`}>
       <div className="library-header" style={{ marginBottom: "28px" }}>
         <div className="library-title-group" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {/*  Custom Cyber Shield Admin Icon Box */}
           <div className="header-icon-box" style={{ 
             width: "56px", 
             height: "56px", 
@@ -125,7 +122,6 @@ const Admin = () => {
             </svg>
           </div>
           <div>
-            {/*  Applied Gradient Text Color to match other pages */}
             <h1 style={{ 
               margin: 0, 
               fontFamily: "'Outfit', sans-serif",
@@ -315,7 +311,7 @@ const OverviewTab = () => {
   );
 };
 
-// ---------------- Songs Tab with Custom Dropdown ----------------
+// ---------------- Songs Tab with Custom Dropdown & Delete Modal ----------------
 const SongsTab = () => {
   const { showToast } = useToast();
   const { t } = useSettings();
@@ -331,6 +327,9 @@ const SongsTab = () => {
   const [status, setStatus] = useState({ type: "", msg: "" });
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+
+  // Modal State for Songs
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, song: null });
 
   const audioInputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -428,10 +427,20 @@ const SongsTab = () => {
     }
   };
 
-  const handleDelete = async (song) => {
-    if (!window.confirm(`${t("confirmDeleteTrack")} "${song.title}"?`)) return;
-    setDeletingId(song._id);
+  // Modal Handlers for Songs
+  const handleDeleteClick = (song) => {
+    setDeleteModal({ isOpen: true, song });
+  };
 
+  const handleCloseModal = () => {
+    setDeleteModal({ isOpen: false, song: null });
+  };
+
+  const handleConfirmDelete = async () => {
+    const { song } = deleteModal;
+    if (!song) return;
+
+    setDeletingId(song._id);
     try {
       await deleteSong(song._id);
       showToast(`${t("deletedTrack")} "${song.title}" 🗑️`, "info");
@@ -440,6 +449,7 @@ const SongsTab = () => {
       showToast(t("couldNotDeleteSong"), "error");
     } finally {
       setDeletingId(null);
+      handleCloseModal();
     }
   };
 
@@ -632,9 +642,9 @@ const SongsTab = () => {
             <button
               type="button"
               className="delete-btn"
-              onClick={() => handleDelete(song)}
+              onClick={() => handleDeleteClick(song)}
               disabled={deletingId === song._id}
-              title={t("deletePlaylistTitle")}
+              title={t("deleteTrackBtn")}
             >
               {deletingId === song._id ? (
                 <FaSpinner className="spinner-icon" />
@@ -649,11 +659,34 @@ const SongsTab = () => {
           <p className="muted empty-list-notice">{t("noMatchingSongs")}</p>
         )}
       </div>
+
+      {/* CUSTOM DELETE SONG MODAL */}
+      {deleteModal.isOpen && (
+        <div className="vibeify-modal-overlay" onClick={handleCloseModal}>
+          <div className="vibeify-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrapper">
+              <FaTrash className="modal-icon error-icon" />
+            </div>
+            {/* 👈 Dynamic Translation added to Modal Title */}
+            <h3>{t("deleteTrackTitle")}</h3>
+            <p>{t("confirmDeleteTrack")} <strong>"{deleteModal.song?.title}"</strong>?</p>
+            <div className="modal-actions">
+              {/* 👈 Dynamic Translation added to Modal Buttons */}
+              <button className="modal-btn cancel" onClick={handleCloseModal}>
+                {t("cancel")}
+              </button>
+              <button className="modal-btn confirm" onClick={handleConfirmDelete}>
+                {t("deleteTrackBtn")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// ---------------- Users Tab ----------------
+// ---------------- Users Tab with Delete Modal ----------------
 const UsersTab = ({ currentUserId }) => {
   const { showToast } = useToast();
   const { t } = useSettings();
@@ -661,6 +694,9 @@ const UsersTab = ({ currentUserId }) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionUserId, setActionUserId] = useState(null);
+
+  // Modal State for Users
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, targetUser: null });
 
   const loadUsers = (query) => {
     getAdminUsers(query)
@@ -704,22 +740,30 @@ const UsersTab = ({ currentUserId }) => {
     }
   };
 
-  const handleDelete = async (u) => {
-    if (!window.confirm(`${t("confirmDeleteUser")} ("${u.username}")`)) {
-      return;
-    }
-    setActionUserId(u._id);
+  // Modal Handlers for Users
+  const handleDeleteClick = (u) => {
+    setDeleteModal({ isOpen: true, targetUser: u });
+  };
 
+  const handleCloseModal = () => {
+    setDeleteModal({ isOpen: false, targetUser: null });
+  };
+
+  const handleConfirmDelete = async () => {
+    const { targetUser } = deleteModal;
+    if (!targetUser) return;
+    
+    setActionUserId(targetUser._id);
     try {
-      await deleteUser(u._id);
-      setUsers((prev) => prev.filter((x) => x._id !== u._id));
-
-      showToast(`${t("userAccountDeleted")} ("${u.username}") 🗑️`, "info");
+      await deleteUser(targetUser._id);
+      setUsers((prev) => prev.filter((x) => x._id !== targetUser._id));
+      showToast(`${t("userAccountDeleted")} ("${targetUser.username}") 🗑️`, "info");
     } catch (err) {
       const errMsg = err.response?.data?.message || t("failedRemoveUser");
       showToast(errMsg, "error");
     } finally {
       setActionUserId(null);
+      handleCloseModal();
     }
   };
 
@@ -789,8 +833,9 @@ const UsersTab = ({ currentUserId }) => {
                     <button
                       type="button"
                       className="delete-btn"
-                      onClick={() => handleDelete(u)}
+                      onClick={() => handleDeleteClick(u)}
                       disabled={isSelf || isProcessing}
+                      title={t("deleteUserBtn")}
                     >
                       {isProcessing ? (
                         <FaSpinner className="spinner-icon" />
@@ -806,6 +851,29 @@ const UsersTab = ({ currentUserId }) => {
             {users.length === 0 && (
               <p className="muted empty-list-notice">{t("noUserAccountsFound")}</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM DELETE USER MODAL */}
+      {deleteModal.isOpen && (
+        <div className="vibeify-modal-overlay" onClick={handleCloseModal}>
+          <div className="vibeify-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrapper">
+              <FaUserCog className="modal-icon error-icon" />
+            </div>
+            {/* 👈 Dynamic Translation added to Modal Title */}
+            <h3>{t("deleteUserTitle")}</h3>
+            <p>{t("confirmDeleteUser")} <strong>("{deleteModal.targetUser?.username}")</strong></p>
+            <div className="modal-actions">
+               {/* 👈 Dynamic Translation added to Modal Buttons */}
+              <button className="modal-btn cancel" onClick={handleCloseModal}>
+                {t("cancel")}
+              </button>
+              <button className="modal-btn confirm" onClick={handleConfirmDelete}>
+                {t("deleteUserBtn")}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const SettingsContext = createContext();
 
-//  Full Dictionary for Complete Translation across all pages
+// Full Dictionary for Complete Translation across all pages
 const translations = {
   en: {
     // ---------------- SETTINGS PAGE ----------------
@@ -120,7 +120,7 @@ const translations = {
     vibeVerseStream: "VIBE-VERSE STREAM",
     trendzHits: "TRENDZ HITS",
     queueVibez: "Queue Vibez",
-    tracks: "tracks", // 👈 Added tracks translation
+    tracks: "tracks",
 
     // ---------------- TOP SONGS PAGE ----------------
     streamVibezz: "STREAM VIBEZZ SONGS",
@@ -206,6 +206,7 @@ const translations = {
     public: "Public",
     private: "Private",
     cancel: "Cancel",
+    clear: "Clear",
     trendingSearches: "TRENDING SEARCHES",
     close: "Close",
     vibesLabel: "VIBES",
@@ -216,6 +217,19 @@ const translations = {
     enterTitlePlaceholder: "Enter title (e.g. Cyberpunk Nights)",
     privacySettingLabel: "Privacy Setting",
     playlistCreatedToast: "created!",
+
+    // Custom Modals Translation Keys
+    clearHistoryTitle: "Clear History?",
+    clearHistoryDesc: "Are you sure you want to clear your recently played tracks? This action cannot be undone.",
+    clearHistoryBtn: "Clear History",
+    deleteTrackTitle: "Delete Track?",
+    deleteTrackBtn: "Delete Track",
+    deleteUserTitle: "Delete User?",
+    deleteUserBtn: "Delete User",
+    deletePlaylistModalTitle: "Delete Playlist?",
+    deletePlaylistModalDesc: "Are you sure you want to delete",
+    deletePlaylistModalDescSuffix: "This action cannot be undone.",
+    deletePlaylistBtn: "Delete Playlist",
 
     // ---------------- ADMIN DASHBOARD ----------------
     overview: "Overview",
@@ -527,7 +541,7 @@ const translations = {
     vibeVerseStream: "வைப்-வெர்ஸ் ஸ்ட்ரீம்",
     trendzHits: "ட்ரெண்ட்ஸ் ஹிட்ஸ்",
     queueVibez: "க்யூ வைப்ஸ்",
-    tracks: "பாடல்கள்", //  Added tracks translation (Tamil)
+    tracks: "பாடல்கள்",
 
     // ---------------- TOP SONGS PAGE ----------------
     streamVibezz: "வைப்ஸ் பாடல்களை ஸ்ட்ரீம் செய்",
@@ -613,6 +627,7 @@ const translations = {
     public: "பொது",
     private: "தனிப்பட்ட",
     cancel: "ரத்துசெய்",
+    clear: "அழி",
     trendingSearches: "டிரெண்டிங் தேடல்கள்",
     close: "மூடு",
     vibesLabel: "வைப்ஸ்",
@@ -623,6 +638,19 @@ const translations = {
     enterTitlePlaceholder: "தலைப்பை உள்ளிடவும் (உதா. சைபர்பಂಕ್ இரவுகள்)",
     privacySettingLabel: "தனியுரிமை அமைப்பு",
     playlistCreatedToast: "உருவாக்கப்பட்டது!",
+
+    // Custom Modals Translation Keys
+    clearHistoryTitle: "வரலாற்றை அழிக்கவா?",
+    clearHistoryDesc: "நீங்கள் சமீபத்தில் கேட்ட பாடல்களின் வரலாற்றை அழிக்க விரும்புகிறீர்களா? இந்தச் செயலைத் தவிர்க்க முடியாது.",
+    clearHistoryBtn: "வரலாற்றை அழி",
+    deleteTrackTitle: "பாடலை நீக்கவா?",
+    deleteTrackBtn: "பாடலை நீக்கு",
+    deleteUserTitle: "பயனரை நீக்கவா?",
+    deleteUserBtn: "பயனரை நீக்கு",
+    deletePlaylistModalTitle: "பிளேலிஸ்ட்டை நீக்கவா?",
+    deletePlaylistModalDesc: "நீங்கள் நிச்சயமாக நீக்க விரும்புகிறீர்களா",
+    deletePlaylistModalDescSuffix: "இந்தச் செயலைத் தவிர்க்க முடியாது.",
+    deletePlaylistBtn: "பிளேலிஸ்ட்டை நீக்கு",
 
     // ---------------- ADMIN DASHBOARD ----------------
     overview: "மேலோட்டம்",
