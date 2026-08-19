@@ -10,7 +10,7 @@ connectDB();
 
 const app = express();
 
-//  CRITICAL FOR RATE LIMITING ON RENDER / VERCEL:
+// CRITICAL FOR RATE LIMITING ON RENDER / VERCEL:
 app.set("trust proxy", 1);
 
 // Allowed origins configuration
@@ -25,6 +25,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -69,7 +70,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
-//  LOCAL VS VERCEL SERVERLESS EXPORT
+// LOCAL VS VERCEL SERVERLESS EXPORT
 const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV !== "production") {
