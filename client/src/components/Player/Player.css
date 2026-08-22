@@ -1,17 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap');
 
-/* COLOR SYSTEM & CSS VARIABLES */
-:root {
-  --vibe-pink: #ff2a85;
-  --vibe-pink-bright: #ff4ecd;
-  --vibe-purple: #8a2be2;
-  --vibe-gradient-primary: linear-gradient(135deg, #ff2a85 0%, #ff4ecd 50%, #8a2be2 100%);
-  --vibe-glow-pink: rgba(255, 42, 133, 0.45);
-  --vibe-glow-purple: rgba(138, 43, 226, 0.45);
-}
-
-/* DYNAMIC RANGE SLIDER FILLS & TRACK GLOW */
-
+/* ==========================================================================
+   RANGE SLIDERS (SEEK & VOLUME)
+   ========================================================================== */
 input[type="range"].progress-bar {
   -webkit-appearance: none !important;
   appearance: none !important;
@@ -39,7 +30,7 @@ input[type="range"].volume-bar {
   cursor: pointer;
 }
 
-/* Slider Thumb Styling */
+/* Slider Thumb */
 input[type="range"].progress-bar::-webkit-slider-thumb,
 input[type="range"].volume-bar::-webkit-slider-thumb {
   -webkit-appearance: none !important;
@@ -49,17 +40,16 @@ input[type="range"].volume-bar::-webkit-slider-thumb {
   border-radius: 50% !important;
   background: #ffffff !important;
   cursor: pointer !important;
-  box-shadow: 0 0 12px var(--accent-primary), 0 0 18px var(--accent-glow) !important;
-  border: 2px solid var(--accent-secondary) !important;
+  box-shadow: 0 0 12px var(--accent-secondary), 0 0 20px var(--accent-glow) !important;
+  border: 2px solid var(--accent-primary) !important;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 input[type="range"].progress-bar::-webkit-slider-thumb:hover,
 input[type="range"].volume-bar::-webkit-slider-thumb:hover {
-  transform: scale(1.35) !important;
+  transform: scale(1.4) !important;
 }
 
-/* Firefox Track Standardizing */
 input[type="range"].progress-bar::-moz-range-track,
 input[type="range"].volume-bar::-moz-range-track {
   height: 5px;
@@ -75,12 +65,13 @@ input[type="range"].volume-bar::-moz-range-thumb {
   border-radius: 50%;
   background: #ffffff;
   cursor: pointer;
-  box-shadow: 0 0 12px var(--accent-primary);
-  border: 2px solid var(--accent-secondary);
+  box-shadow: 0 0 12px var(--accent-secondary);
+  border: 2px solid var(--accent-primary);
 }
 
-/* FLOATING BAR CONTAINER & STRUCTURE */
-
+/* ==========================================================================
+   FLOATING DOCK WRAPPER & CONTAINER
+   ========================================================================== */
 .player-wrapper {
   position: fixed;
   bottom: 16px;
@@ -97,10 +88,10 @@ input[type="range"].volume-bar::-moz-range-thumb {
 .player {
   position: relative;
   height: 76px;
-  background: rgba(10, 8, 16, 0.92);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border: 1px solid rgba(255, 78, 205, 0.3);
+  background: rgba(12, 10, 20, 0.92);
+  backdrop-filter: blur(35px) saturate(200%);
+  -webkit-backdrop-filter: blur(35px) saturate(200%);
+  border: 1px solid var(--accent-glow);
   border-radius: 24px;
   display: flex !important;
   align-items: center !important;
@@ -108,7 +99,7 @@ input[type="range"].volume-bar::-moz-range-thumb {
   padding: 0 24px;
   box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.9),
               inset 0 1px 2px rgba(255, 255, 255, 0.2),
-              0 0 25px var(--accent-glow);
+              0 0 30px var(--accent-glow);
   overflow: hidden;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
@@ -136,8 +127,8 @@ input[type="range"].volume-bar::-moz-range-thumb {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 12px var(--accent-primary), 0 0 20px var(--accent-glow);
+  background: var(--accent-secondary);
+  box-shadow: 0 0 12px var(--accent-secondary), 0 0 20px var(--accent-glow);
   animation: pulseGlow 1.8s infinite alternate cubic-bezier(0.4, 0, 0.6, 1);
 }
 
@@ -146,8 +137,9 @@ input[type="range"].volume-bar::-moz-range-thumb {
   100% { opacity: 1; transform: scale(1.3); }
 }
 
-/* LEFT COLUMN: TRACK METADATA & COVER ART */
-
+/* ==========================================================================
+   LEFT COLUMN: TRACK METADATA & COVER ART
+   ========================================================================== */
 .player-left {
   display: flex;
   align-items: center;
@@ -184,7 +176,7 @@ input[type="range"].volume-bar::-moz-range-thumb {
   transform: scale(1.08);
 }
 
-/* Wave Equalizer Overlay */
+/* Live Equalizer Overlay on Thumb */
 .art-playing-overlay {
   position: absolute;
   inset: 0;
@@ -227,6 +219,7 @@ input[type="range"].volume-bar::-moz-range-thumb {
 }
 
 .player-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: #ffffff;
@@ -249,8 +242,91 @@ input[type="range"].volume-bar::-moz-range-thumb {
   font-weight: 500;
 }
 
-/* CENTER COLUMN: CONTROLS & SEEK SLIDER */
+/* ==========================================================================
+   INSTAGRAM-STYLE LIKE ANIMATION
+   ========================================================================== */
+@keyframes heartInstagramPulse {
+  0% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.45) rotate(-12deg);
+  }
+  30% {
+    transform: scale(0.9) rotate(8deg);
+  }
+  45% {
+    transform: scale(1.25) rotate(-4deg);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
 
+@keyframes burstRingExpand {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+    border-width: 3px;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+    border-width: 0;
+  }
+}
+
+.like-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  color: #94a3b8;
+  transition: all 0.25s ease;
+}
+
+.like-btn:hover {
+  background: var(--accent-glow);
+}
+
+.unliked-heart-icon {
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.like-btn:hover .unliked-heart-icon {
+  color: var(--accent-secondary);
+}
+
+.liked-heart-icon {
+  color: var(--accent-secondary) !important;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.instagram-heart-burst {
+  animation: heartInstagramPulse 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+.heart-burst-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-secondary);
+  pointer-events: none;
+  animation: burstRingExpand 0.7s ease-out forwards;
+}
+
+/* ==========================================================================
+   CENTER COLUMN: CONTROLS & SEEK SLIDER
+   ========================================================================== */
 .player-center {
   display: flex;
   flex-direction: column;
@@ -293,18 +369,17 @@ input[type="range"].volume-bar::-moz-range-thumb {
   transform: scale(0.9);
 }
 
+.control-step-btn:hover {
+  color: var(--accent-secondary);
+}
+
 .toggle-btn.active {
   color: var(--accent-secondary);
   background: var(--accent-glow);
   box-shadow: 0 0 14px var(--accent-glow);
 }
 
-.like-btn .liked {
-  color: var(--accent-secondary) !important;
-  filter: drop-shadow(0 0 10px var(--accent-glow));
-}
-
-/* PLAY / PAUSE BUTTON GLOW (Dynamic Theme Color Integration) */
+/* PLAY / PAUSE BUTTON GLOW */
 .player .play-btn,
 .player .play-btn.is-playing,
 .mobile-play-btn {
@@ -333,13 +408,6 @@ input[type="range"].volume-bar::-moz-range-thumb {
   transform: scale(0.95) !important;
 }
 
-.player .play-btn svg,
-.mobile-play-btn svg {
-  font-size: 1.15rem !important;
-  color: #ffffff !important;
-  transform: translateX(1px);
-}
-
 /* Progress Row */
 .progress-row {
   display: flex;
@@ -363,8 +431,9 @@ input[type="range"].volume-bar::-moz-range-thumb {
   align-items: center;
 }
 
-/* RIGHT COLUMN: VOLUME CAPSULE & EXPAND */
-
+/* ==========================================================================
+   RIGHT COLUMN: VOLUME CAPSULE & FULLSCREEN TRIGGER
+   ========================================================================== */
 .player-right {
   display: flex;
   align-items: center;
@@ -415,8 +484,9 @@ input[type="range"].volume-bar::-moz-range-thumb {
   transform: scale(1.08);
 }
 
-/* MOBILE FLOATING CAPSULE (< 768px) */
-
+/* ==========================================================================
+   MOBILE FLOATING CAPSULE (< 768px)
+   ========================================================================== */
 .mobile-top-progress,
 .mobile-right-controls {
   display: none;
@@ -433,7 +503,7 @@ input[type="range"].volume-bar::-moz-range-thumb {
     border-radius: 20px;
     padding: 0 16px;
     background: rgba(8, 6, 14, 0.95);
-    border-color: var(--accent-glow);
+    border-color: var(--accent-secondary);
   }
 
   .mobile-top-progress {
@@ -475,6 +545,10 @@ input[type="range"].volume-bar::-moz-range-thumb {
     max-width: 175px;
   }
 
+  .player-left .like-btn {
+    display: none;
+  }
+
   .player-center,
   .player-right {
     display: none !important;
@@ -489,6 +563,10 @@ input[type="range"].volume-bar::-moz-range-thumb {
   .mobile-play-btn {
     width: 40px !important;
     height: 40px !important;
+  }
+
+  .mobile-like-btn {
+    padding: 6px;
   }
 }
 

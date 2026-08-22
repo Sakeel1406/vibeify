@@ -10,10 +10,8 @@ connectDB();
 
 const app = express();
 
-// CRITICAL FOR RATE LIMITING ON RENDER / VERCEL:
 app.set("trust proxy", 1);
 
-// Allowed origins configuration
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -25,7 +23,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin, explicit allowed origins, or any Vercel deployment/preview subdomain
       if (
         !origin || 
         allowedOrigins.includes(origin) || 
@@ -44,7 +41,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Skip rate limiting for Auth routes and general song fetches
 app.use("/api", (req, res, next) => {
   if (req.path.startsWith("/auth") || (req.method === "GET" && req.path === "/songs")) {
     return next();
@@ -58,13 +54,12 @@ app.use("/api/songs", require("./routes/songRoutes"));
 app.use("/api/playlists", require("./routes/playlistRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/artists", require("./routes/artistRoutes")); // 👈 Added Artist Routes
 
-// Root Health Check Route
 app.get("/", (req, res) => {
   res.send("Vibeify API is running cleanly!");
 });
 
-// ERROR HANDLING MIDDLEWARES
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
@@ -74,7 +69,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
-// LOCAL VS VERCEL SERVERLESS EXPORT
 const PORT = process.env.PORT || 5000;
 
 if (process.env.NODE_ENV !== "production") {
@@ -83,5 +77,4 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Export the app for Vercel serverless deployment using CommonJS
 module.exports = app;

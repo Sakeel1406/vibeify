@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaPlay,
@@ -15,8 +15,8 @@ import {
 } from "react-icons/fa";
 import { useMusic } from "../../context/PlayerContext";
 import { useAuth } from "../../context/AuthContext";
-import { useToast } from "../../context/ToastContext"; 
-import { useSettings } from "../../context/SettingsContext"; // Import Settings
+import { useToast } from "../../context/ToastContext";
+import { useSettings } from "../../context/SettingsContext";
 import { toggleLikeSong, getLikedSongs } from "../../services/api";
 import "./Player.css";
 
@@ -33,9 +33,7 @@ const Player = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { showToast } = useToast(); 
-  
-  //  Extract translation function and dynamic theme
+  const { showToast } = useToast();
   const { t, theme } = useSettings();
 
   const {
@@ -56,6 +54,7 @@ const Player = () => {
   } = useMusic();
 
   const [likedIds, setLikedIds] = useState([]);
+  const [likeBurst, setLikeBurst] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -64,22 +63,45 @@ const Player = () => {
       .catch(() => {});
   }, [user]);
 
+  // HIDE floating player if we are already inside the expanded /now-playing screen
+  if (location.pathname === "/now-playing") {
+    return null;
+  }
+
+  if (!currentSong) {
+    return (
+      <footer className={`player-wrapper player-empty-wrap theme-${theme}`}>
+        <div className="player player-empty">
+          <span className="empty-pulse" />
+          <span>{t("selectVibePrompt") || "Select a vibe to ignite audio"}</span>
+        </div>
+      </footer>
+    );
+  }
+
   const isLiked = currentSong && likedIds.includes(currentSong._id);
 
   const handleLike = (e) => {
     e.stopPropagation();
     if (!user || !currentSong) return;
-    toggleLikeSong(currentSong._id);
+
     const newLikedState = !isLiked;
+    if (newLikedState) {
+      setLikeBurst(true);
+      setTimeout(() => setLikeBurst(false), 900);
+    }
+
+    toggleLikeSong(currentSong._id);
     setLikedIds((prev) =>
       newLikedState
         ? [...prev, currentSong._id]
         : prev.filter((id) => id !== currentSong._id)
     );
+
     showToast(
       newLikedState
-        ? t("addedToLikedSongs")
-        : t("removedFromLikedSongs"),
+        ? t("addedToLikedSongs") || "Added to Liked Songs ❤️"
+        : t("removedFromLikedSongs") || "Removed from Liked Songs",
       newLikedState ? "success" : "info"
     );
   };
@@ -87,40 +109,39 @@ const Player = () => {
   const handleShuffleToggle = () => {
     const nextShuffle = !shuffle;
     setShuffle(nextShuffle);
-    showToast(nextShuffle ? t("shuffleEnabled") : t("shuffleDisabled"), "info");
+    showToast(
+      nextShuffle
+        ? t("shuffleEnabled") || "Shuffle mode activated 🔀"
+        : t("shuffleDisabled") || "Shuffle mode off",
+      "info"
+    );
   };
 
   const handleRepeatToggle = () => {
     const nextRepeat = !repeat;
     setRepeat(nextRepeat);
-    showToast(nextRepeat ? t("repeatEnabled") : t("repeatDisabled"), "info");
+    showToast(
+      nextRepeat
+        ? t("repeatEnabled") || "Repeat current track on 🔁"
+        : t("repeatDisabled") || "Repeat off",
+      "info"
+    );
   };
 
   const handleVolumeChange = (newVol) => {
     setVolume(newVol);
     if (newVol === 0) {
-      showToast(t("audioMuted"), "info");
+      showToast(t("audioMuted") || "Volume muted", "info");
     }
   };
-
-  if (!currentSong) {
-    return (
-      <footer className={`player-wrapper player-empty-wrap theme-${theme}`}>
-        <div className="player player-empty">
-          <span className="empty-pulse" />
-          <span>{t("selectVibePrompt")}</span>
-        </div>
-      </footer>
-    );
-  }
 
   const progressPercent = (progress / (duration || 1)) * 100;
   const volumePercent = volume * 100;
 
   return (
-    // 👈 Apply theme class wrapper
     <div className={`player-wrapper theme-${theme}`}>
       <footer className="player">
+        {/* Mobile Top Progress Line */}
         <div className="mobile-top-progress">
           <div
             className="mobile-progress-fill"
@@ -128,6 +149,7 @@ const Player = () => {
           />
         </div>
 
+        {/* Left Column: Track Info & Cover */}
         <div className="player-left" onClick={() => navigate("/now-playing")}>
           <div className="player-art-wrap">
             <img
@@ -153,38 +175,45 @@ const Player = () => {
 
           {user && (
             <button
-              className={`icon-btn like-btn ${isLiked ? "liked-active" : ""}`}
+              className={`icon-btn like-btn ${isLiked ? "liked-active" : ""} ${likeBurst ? "instagram-heart-burst" : ""}`}
               onClick={handleLike}
-              title={t("likeSongTitle")}
-              aria-label={t("likeSongTitle")}
+              title={t("likeSongTitle") || "Like Song"}
+              aria-label={t("likeSongTitle") || "Like Song"}
+              type="button"
             >
               {isLiked ? (
-                <FaHeart color="#ff4ecd" className="liked" />
+                <FaHeart className="liked-heart-icon" />
               ) : (
-                <FaRegHeart />
+                <FaRegHeart className="unliked-heart-icon" />
               )}
+              {likeBurst && <span className="heart-burst-ring" />}
             </button>
           )}
         </div>
 
+        {/* Center Column: Controls & Progress */}
         <div className="player-center">
           <div className="player-controls">
             <button
               className={`icon-btn toggle-btn ${shuffle ? "active" : ""}`}
               onClick={handleShuffleToggle}
-              title={t("shuffleTooltip")}
-              aria-label={t("shuffleTooltip")}
+              title={t("shuffleTooltip") || "Shuffle"}
+              aria-label={t("shuffleTooltip") || "Shuffle"}
+              type="button"
             >
-              <FaRandom />
+              <FaRandom size={13} />
             </button>
+
             <button
-              className="icon-btn"
+              className="icon-btn control-step-btn"
               onClick={prevSong}
-              title={t("prevSongTooltip")}
-              aria-label={t("previousTrackAria")}
+              title={t("prevSongTooltip") || "Previous"}
+              aria-label={t("previousTrackAria") || "Previous Track"}
+              type="button"
             >
-              <FaStepBackward />
+              <FaStepBackward size={14} />
             </button>
+
             <button
               className={`play-btn ${isPlaying ? "is-playing" : ""}`}
               onClick={(e) => {
@@ -192,29 +221,34 @@ const Player = () => {
                 togglePlay();
               }}
               title={isPlaying ? t("pauseTooltip") : t("playTooltip")}
-              aria-label={t("playPauseAria")}
+              aria-label={t("playPauseAria") || "Play / Pause"}
+              type="button"
             >
               {isPlaying ? (
-                <FaPause />
+                <FaPause size={15} />
               ) : (
-                <FaPlay style={{ marginLeft: "3px" }} />
+                <FaPlay size={15} style={{ marginLeft: "2px" }} />
               )}
             </button>
+
             <button
-              className="icon-btn"
+              className="icon-btn control-step-btn"
               onClick={nextSong}
-              title={t("nextSongTooltip")}
-              aria-label={t("nextTrackAria")}
+              title={t("nextSongTooltip") || "Next"}
+              aria-label={t("nextTrackAria") || "Next Track"}
+              type="button"
             >
-              <FaStepForward />
+              <FaStepForward size={14} />
             </button>
+
             <button
               className={`icon-btn toggle-btn ${repeat ? "active" : ""}`}
               onClick={handleRepeatToggle}
-              title={t("repeatTooltip")}
-              aria-label={t("repeatTooltip")}
+              title={t("repeatTooltip") || "Repeat"}
+              aria-label={t("repeatTooltip") || "Repeat"}
+              type="button"
             >
-              <FaRedo />
+              <FaRedo size={12} />
             </button>
           </div>
 
@@ -229,7 +263,7 @@ const Player = () => {
                 onChange={(e) => seekTo(Number(e.target.value))}
                 className="progress-bar"
                 style={{
-                  background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-secondary) ${progressPercent}%, rgba(255, 255, 255, 0.08) ${progressPercent}%, rgba(255, 255, 255, 0.08) 100%)`,
+                  background: `linear-gradient(to right, #a855f7 0%, #ec4899 ${progressPercent}%, rgba(255, 255, 255, 0.08) ${progressPercent}%, rgba(255, 255, 255, 0.08) 100%)`,
                 }}
               />
             </div>
@@ -237,15 +271,17 @@ const Player = () => {
           </div>
         </div>
 
+        {/* Right Column: Volume & Fullscreen Trigger */}
         <div className="player-right">
           <div className="volume-capsule">
             <button
               className="icon-btn vol-icon"
               onClick={() => handleVolumeChange(volume > 0 ? 0 : 0.8)}
-              title={t("muteTooltip")}
-              aria-label={t("toggleMuteAria")}
+              title={t("muteTooltip") || "Mute"}
+              aria-label={t("toggleMuteAria") || "Mute"}
+              type="button"
             >
-              {volume > 0 ? <FaVolumeUp /> : <FaVolumeMute />}
+              {volume > 0 ? <FaVolumeUp size={14} /> : <FaVolumeMute size={14} />}
             </button>
             <input
               type="range"
@@ -256,38 +292,52 @@ const Player = () => {
               onChange={(e) => handleVolumeChange(Number(e.target.value))}
               className="volume-bar"
               style={{
-                background: `linear-gradient(to right, var(--accent-primary) 0%, var(--accent-secondary) ${volumePercent}%, rgba(255, 255, 255, 0.1) ${volumePercent}%, rgba(255, 255, 255, 0.1) 100%)`,
+                background: `linear-gradient(to right, #a855f7 0%, #ec4899 ${volumePercent}%, rgba(255, 255, 255, 0.1) ${volumePercent}%, rgba(255, 255, 255, 0.1) 100%)`,
               }}
             />
           </div>
 
-          {location.pathname !== "/now-playing" && (
-            <button
-              className="icon-btn expand-btn"
-              onClick={() => navigate("/now-playing")}
-              title={t("expandPlayerTooltip")}
-              aria-label={t("expandPlayerAria")}
-            >
-              <FaExpandAlt />
-            </button>
-          )}
+          <button
+            className="icon-btn expand-btn"
+            onClick={() => navigate("/now-playing")}
+            title={t("expandPlayerTooltip") || "Expand Player"}
+            aria-label={t("expandPlayerAria") || "Expand Player"}
+            type="button"
+          >
+            <FaExpandAlt size={13} />
+          </button>
         </div>
 
+        {/* Mobile Right Quick Action Buttons */}
         <div className="mobile-right-controls">
+          {user && (
+            <button
+              className={`icon-btn mobile-like-btn ${isLiked ? "liked-active" : ""} ${likeBurst ? "instagram-heart-burst" : ""}`}
+              onClick={handleLike}
+              aria-label="Like track"
+              type="button"
+            >
+              {isLiked ? (
+                <FaHeart size={16} className="liked-heart-icon" />
+              ) : (
+                <FaRegHeart size={16} className="unliked-heart-icon" />
+              )}
+            </button>
+          )}
+
           <button
-            className={`play-btn mobile-play-btn ${
-              isPlaying ? "is-playing" : ""
-            }`}
+            className={`play-btn mobile-play-btn ${isPlaying ? "is-playing" : ""}`}
             onClick={(e) => {
               e.stopPropagation();
               togglePlay();
             }}
-            aria-label={t("playPauseAria")}
+            aria-label={t("playPauseAria") || "Play / Pause"}
+            type="button"
           >
             {isPlaying ? (
-              <FaPause />
+              <FaPause size={14} />
             ) : (
-              <FaPlay style={{ marginLeft: "2px" }} />
+              <FaPlay size={14} style={{ marginLeft: "2px" }} />
             )}
           </button>
         </div>

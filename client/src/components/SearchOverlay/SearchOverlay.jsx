@@ -1,28 +1,44 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiFire } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiMusic, FiUser } from 'react-icons/fi';
 import { useMusic } from '../../context/PlayerContext';
 import { useToast } from '../../context/ToastContext';
-import { useSettings } from '../../context/SettingsContext'; // Import Settings
-import { getSongs } from '../../services/api';
+import { useSettings } from '../../context/SettingsContext';
+import { useAuth } from '../../context/AuthContext';
+import { getSongs, getRecentlyPlayed, getArtists } from '../../services/api';
+import {
+  resolveArtistImage,
+  normalizeArtistDisplayName,
+  ARTIST_LOCAL_MAP,
+} from '../../utils/artistPhotos';
 import './SearchOverlay.css';
 
-// LOCAL IMAGE IMPORTS
-import anirudhImg from '../../assets/images/anirudh.jpg';
-import dheemaImg from '../../assets/images/dheema.jpg';
-import godModeImg from '../../assets/images/god-mode.jpg';
-import hiphopImg from '../../assets/images/hiphop-tamizha.jpg';
-import thalapathyImg from '../../assets/images/thalapathy-kacheri.jpg';
+const formatTitleCase = (str) => {
+  if (!str) return '';
+  return str
+    .split(' ')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+};
 
-const DEFAULT_TRENDING = [
-  { id: 't1', title: 'God Mode', type: 'Song', subtitle: 'Karuppu', image: godModeImg },
-  { id: 't2', title: 'Dheema', type: 'Song', subtitle: 'Love Insurance Kompany', image: dheemaImg },
-  { id: 't3', title: 'Anirudh Ravichander', type: 'Artist', subtitle: 'Artist', image: anirudhImg },
-  { id: 't4', title: 'Thalapathy Kacheri', type: 'Song', subtitle: 'Single', image: thalapathyImg },
-  { id: 't5', title: 'Hiphop Tamizha', type: 'Artist', subtitle: 'Artist', image: hiphopImg },
-];
+const matchAllowedArtistKey = (rawName) => {
+  if (!rawName) return null;
+  const clean = rawName.toLowerCase().trim();
+
+  if (ARTIST_LOCAL_MAP[clean]) {
+    return normalizeArtistDisplayName(clean);
+  }
+
+  for (const key of Object.keys(ARTIST_LOCAL_MAP)) {
+    if (clean.includes(key) || key.includes(clean)) {
+      return normalizeArtistDisplayName(key);
+    }
+  }
+
+  return normalizeArtistDisplayName(rawName);
+};
 
 export default function SearchOverlay({
   songList: propSongList = [],
@@ -34,61 +50,177 @@ export default function SearchOverlay({
   const navigate = useNavigate();
   const { playSong } = useMusic();
   const { showToast } = useToast();
-  
-  // Extract translation function and dynamic theme
+  const { user } = useAuth();
   const { t, theme } = useSettings();
 
   const [internalTerm, setInternalTerm] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [activeCategoryTab, setActiveCategoryTab] = useState('all');
   const [localCatalog, setLocalCatalog] = useState([]);
+  const [dbArtists, setDbArtists] = useState([]);
+  const [userRecentTracks, setUserRecentTracks] = useState([]);
   const containerRef = useRef(null);
 
-  // Auto fetch songs if parent passed empty propSongList
   useEffect(() => {
-    if (propSongList && propSongList.length > 0) {
-      setLocalCatalog(propSongList);
-    } else {
-      getSongs()
-        .then((res) => setLocalCatalog(res.data || []))
-        .catch(() => setLocalCatalog([]));
+    let isMounted = true;
+
+    Promise.all([
+      propSongList.length > 0 ? Promise.resolve({ data: propSongList }) : getSongs().catch(() => ({ data: [] })),
+      getArtists().catch(() => ({ data: [] })),
+    ]).then(([songsRes, artistsRes]) => {
+      if (!isMounted) return;
+      setLocalCatalog(Array.isArray(songsRes.data) ? songsRes.data : songsRes.data?.data || []);
+      setDbArtists(Array.isArray(artistsRes.data) ? artistsRes.data : []);
+    });
+
+    if (user) {
+      getRecentlyPlayed()
+        .then((res) => {
+          if (!isMounted) return;
+          const formattedRecent = (res.data || []).slice(0, 4).map((s) => ({
+            id: s._id || s.id,
+            title: s.title || s.songName || s.name,
+            type: 'Song',
+            subtitle: s.artist || s.album || 'Single',
+            image: s.image || s.coverUrl || s.img,
+            rawSong: s,
+          }));
+          setUserRecentTracks(formattedRecent);
+        })
+        .catch(() => setUserRecentTracks([]));
     }
-  }, [propSongList]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [propSongList, user]);
 
   const activeCatalog = propSongList.length > 0 ? propSongList : localCatalog;
   const searchTerm = externalQuery !== undefined ? externalQuery : internalTerm;
+  const cleanQ = searchTerm.toLowerCase().trim();
 
-  // Flexible multi-field backend catalog filter
-  const filteredResults = activeCatalog.filter((song) => {
-    const q = searchTerm.toLowerCase().trim();
-    if (!q) return false;
+  // Exactly 3 Top Artists from Catalog / Database
+  const topArtistsList = useMemo(() => {
+    const map = new Map();
 
-    const title = (song.title || song.songName || song.name || '').toLowerCase();
-    const artist = (song.artist || song.artistName || song.singers || '').toLowerCase();
-    const album = (song.album || song.movie || '').toLowerCase();
+    dbArtists.forEach((a) => {
+      if (!a.name) return;
+      const canonical = matchAllowedArtistKey(a.name);
+      if (canonical) {
+        map.set(canonical.toLowerCase(), {
+          id: a._id || canonical,
+          name: canonical,
+          image: resolveArtistImage(canonical, a.image, null),
+          count: 0,
+        });
+      }
+    });
 
-    return title.includes(q) || artist.includes(q) || album.includes(q);
-  });
+    activeCatalog.forEach((song) => {
+      if (!song.artist) return;
+      const parts = song.artist.split(/[,&/]| ft\. | feat\. /i).map((p) => p.trim()).filter(Boolean);
+      parts.forEach((part) => {
+        const canonical = matchAllowedArtistKey(part);
+        if (canonical) {
+          const key = canonical.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, {
+              id: key,
+              name: canonical,
+              image: resolveArtistImage(canonical, null, song.image),
+              count: 1,
+            });
+          } else {
+            const item = map.get(key);
+            item.count += 1;
+            if (!item.image) {
+              item.image = resolveArtistImage(canonical, null, song.image);
+            }
+          }
+        }
+      });
+    });
+
+    return Array.from(map.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  }, [dbArtists, activeCatalog]);
+
+  // Search Results
+  const filteredSongs = useMemo(() => {
+    if (!cleanQ) return [];
+    return activeCatalog.filter((song) => {
+      const title = (song.title || song.songName || song.name || '').toLowerCase();
+      const artist = (song.artist || song.artistName || song.singers || '').toLowerCase();
+      const album = (song.album || song.movie || '').toLowerCase();
+      return title.includes(cleanQ) || artist.includes(cleanQ) || album.includes(cleanQ);
+    });
+  }, [activeCatalog, cleanQ]);
+
+  const matchedArtists = useMemo(() => {
+    if (!cleanQ) return [];
+    const map = new Map();
+
+    dbArtists.forEach((a) => {
+      if (!a.name) return;
+      const canonical = matchAllowedArtistKey(a.name);
+      if (canonical && (canonical.toLowerCase().includes(cleanQ) || cleanQ.includes(canonical.toLowerCase()))) {
+        map.set(canonical.toLowerCase(), {
+          id: a._id || canonical,
+          name: canonical,
+          image: resolveArtistImage(canonical, a.image, null),
+        });
+      }
+    });
+
+    activeCatalog.forEach((song) => {
+      if (!song.artist) return;
+      const parts = song.artist.split(/[,&/]| ft\. | feat\. /i).map((p) => p.trim()).filter(Boolean);
+      parts.forEach((part) => {
+        const canonical = matchAllowedArtistKey(part);
+        if (canonical && (canonical.toLowerCase().includes(cleanQ) || cleanQ.includes(canonical.toLowerCase()))) {
+          const key = canonical.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, {
+              id: key,
+              name: canonical,
+              image: resolveArtistImage(canonical, null, song.image),
+            });
+          }
+        }
+      });
+    });
+
+    return Array.from(map.values()).slice(0, 3);
+  }, [cleanQ, dbArtists, activeCatalog]);
+
+  const displayRecentTracks = userRecentTracks.length > 0
+    ? userRecentTracks
+    : activeCatalog.slice(0, 4).map((s) => ({
+        id: s._id || s.id,
+        title: s.title || s.songName || s.name,
+        type: 'Song',
+        subtitle: s.artist || s.album || 'Single',
+        image: s.image || s.coverUrl || s.img,
+        rawSong: s,
+      }));
 
   const handleInputChange = (e) => {
     const val = e.target.value;
-    setSelectedIndex(-1);
     if (onSearchChange) onSearchChange(val);
     else setInternalTerm(val);
   };
 
   const clearSearch = () => {
-    setSelectedIndex(-1);
     if (onSearchChange) onSearchChange('');
     else setInternalTerm('');
   };
 
-  // Track Play Function
   const triggerPlay = (track) => {
     setIsFocused(false);
-    const trackTitle = track.title || track.songName || track.name || "Track";
-    showToast(`${t("playingTrack")} "${trackTitle}" 🎵`, "info");
-    
+    const trackTitle = track.title || track.songName || track.name || 'Track';
+    showToast(`${t("playingTrack")} "${trackTitle}" 🎵`, 'success');
+
     if (onSelectSong) {
       onSelectSong(track);
     } else if (playSong) {
@@ -96,68 +228,23 @@ export default function SearchOverlay({
     }
   };
 
-  // Navigation Handler
-  const handleGlobalSearchNavigate = (queryToSearch, silent = false) => {
+  const handleGlobalSearchNavigate = (queryToSearch) => {
     setIsFocused(false);
     const targetQuery = queryToSearch || searchTerm;
     if (targetQuery.trim()) {
-      if (!silent) {
-        showToast(`${t("searchingFor")} "${targetQuery.trim()}"`, "info");
-      }
       navigate(`/search?q=${encodeURIComponent(targetQuery.trim())}`);
     }
   };
 
-  const handleSongClick = (song) => {
+  const handleArtistClick = (artistName) => {
     setIsFocused(false);
-    triggerPlay(song);
-  };
-
-  const handleTrendingClick = (item) => {
-    setIsFocused(false);
-
-    if (item.type === 'Song') {
-      const targetTitle = item.title.toLowerCase().trim();
-
-      const backendSong = activeCatalog.find((s) => {
-        const title = (s.title || s.songName || s.name || '').toLowerCase().trim();
-        return title.includes(targetTitle) || targetTitle.includes(title);
-      });
-
-      if (backendSong) {
-        triggerPlay(backendSong);
-      } else {
-        handleGlobalSearchNavigate(item.title);
-      }
-    } else {
-      handleGlobalSearchNavigate(item.title);
-    }
+    navigate(`/artist/${encodeURIComponent(artistName)}`);
   };
 
   const handleKeyDownInput = (e) => {
-    const activeList = !searchTerm.trim() ? DEFAULT_TRENDING : filteredResults;
-
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev < activeList.length - 1 ? prev + 1 : 0));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : activeList.length - 1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (selectedIndex >= 0 && activeList[selectedIndex]) {
-        const selected = activeList[selectedIndex];
-        if (!searchTerm.trim()) {
-          handleTrendingClick(selected);
-        } else {
-          handleSongClick(selected);
-        }
-      } else if (onSearchSubmit) {
-        setIsFocused(false);
-        onSearchSubmit(e);
-      } else {
-        handleGlobalSearchNavigate();
-      }
+      handleGlobalSearchNavigate();
     }
   };
 
@@ -182,9 +269,7 @@ export default function SearchOverlay({
   }, [handleKeyDownEvent]);
 
   return (
-    //  Apply active theme class
     <div ref={containerRef} className={`search-overlay-container theme-${theme}`}>
-      {/* Search Input Box */}
       <div className={`search-input-box ${isFocused ? 'focused' : ''}`}>
         <FiSearch className="search-icon" />
 
@@ -200,9 +285,9 @@ export default function SearchOverlay({
 
         {searchTerm && (
           <button
+            type="button"
             onClick={clearSearch}
             className="search-clear-btn"
-            type="button"
             aria-label="Clear Search"
           >
             ✕
@@ -210,9 +295,8 @@ export default function SearchOverlay({
         )}
       </div>
 
-      {/* Floating Dropdown Drawer */}
       {isFocused && (
-        <div className="search-dropdown-menu">
+        <div className="search-dropdown-menu fade-slide-in">
           {!searchTerm.trim() ? (
             <div>
               <div className="dropdown-header">
@@ -228,26 +312,52 @@ export default function SearchOverlay({
                 </button>
               </div>
 
+              {/* Top Artists */}
+              <div className="trending-section-label">{t("topArtists") || "Top Artists"}</div>
+              <div className="song-results-list" style={{ marginBottom: '14px' }}>
+                {topArtistsList.map((artist) => (
+                  <div
+                    key={artist.id}
+                    onClick={() => handleArtistClick(artist.name)}
+                    className="song-result-item"
+                  >
+                    <div className="song-meta">
+                      <img
+                        src={artist.image}
+                        alt={artist.name}
+                        className="artist-avatar"
+                      />
+                      <div className="song-meta-text">
+                        <h4 className="song-title">{formatTitleCase(artist.name)}</h4>
+                        <p className="song-subtitle">{t("artists") || "Artist"}</p>
+                      </div>
+                    </div>
+                    <span className="play-tag explore-tag">{t("exploreTag") || "Explore ➔"}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Recently Played */}
+              <div className="trending-section-label">{t("recentlyPlayed")}</div>
               <div className="song-results-list">
-                {DEFAULT_TRENDING.map((item, idx) => (
+                {displayRecentTracks.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => handleTrendingClick(item)}
-                    className={`song-result-item ${selectedIndex === idx ? 'selected' : ''}`}
+                    onClick={() => triggerPlay(item.rawSong || item)}
+                    className="song-result-item"
                   >
                     <div className="song-meta">
                       <img
                         src={item.image}
                         alt={item.title}
-                        className={item.type === 'Artist' ? 'artist-avatar' : 'song-cover'}
+                        className="song-cover"
                       />
                       <div className="song-meta-text">
                         <h4 className="song-title">{item.title}</h4>
-                        <p className="song-subtitle">
-                          {item.type === 'Artist' ? t("artists") : `${t("songLabel")} • ${item.subtitle}`}
-                        </p>
+                        <p className="song-subtitle">{t("songLabel")} • {item.subtitle}</p>
                       </div>
                     </div>
+                    <span className="play-tag">{t("playTag")}</span>
                   </div>
                 ))}
               </div>
@@ -267,44 +377,119 @@ export default function SearchOverlay({
                 </button>
               </div>
 
-              {filteredResults.length > 0 ? (
-                <div className="song-results-list">
-                  {filteredResults.map((song, index) => (
-                    <div
-                      key={song._id || song.id || index}
-                      onClick={() => handleSongClick(song)}
-                      className={`song-result-item ${selectedIndex === index ? 'selected' : ''}`}
-                    >
-                      <div className="song-meta">
-                        <img
-                          src={song.image || song.coverUrl || song.img}
-                          alt={song.title || song.songName || 'Song'}
-                          className={song.type === 'artist' ? 'artist-avatar' : 'song-cover'}
-                        />
-                        <div className="song-meta-text">
-                          <h4 className="song-title">{song.title || song.songName || song.name}</h4>
-                          <p className="song-subtitle">
-                            {song.type === 'artist'
-                              ? t("artists")
-                              : `${t("songLabel")} • ${song.artist || song.artistName || song.singers || song.album || t("singleRelease")}`}
-                          </p>
+              <div className="search-sub-tabs">
+                <button
+                  type="button"
+                  className={`sub-tab-chip ${activeCategoryTab === 'all' ? 'active' : ''}`}
+                  onClick={() => setActiveCategoryTab('all')}
+                >
+                  {t("all")}
+                </button>
+                <button
+                  type="button"
+                  className={`sub-tab-chip ${activeCategoryTab === 'songs' ? 'active' : ''}`}
+                  onClick={() => setActiveCategoryTab('songs')}
+                >
+                  <FiMusic size={12} /> {t("songsTab")} ({filteredSongs.length})
+                </button>
+                <button
+                  type="button"
+                  className={`sub-tab-chip ${activeCategoryTab === 'artists' ? 'active' : ''}`}
+                  onClick={() => setActiveCategoryTab('artists')}
+                >
+                  <FiUser size={12} /> {t("artists")} ({matchedArtists.length})
+                </button>
+              </div>
+
+              {activeCategoryTab === 'artists' ? (
+                matchedArtists.length > 0 ? (
+                  <div className="song-results-list">
+                    {matchedArtists.map((artist) => (
+                      <div
+                        key={artist.id}
+                        onClick={() => handleArtistClick(artist.name)}
+                        className="song-result-item"
+                      >
+                        <div className="song-meta">
+                          <img
+                            src={artist.image}
+                            alt={artist.name}
+                            className="artist-avatar"
+                          />
+                          <div className="song-meta-text">
+                            <h4 className="song-title">{formatTitleCase(artist.name)}</h4>
+                            <p className="song-subtitle">{t("artists") || "Artist"}</p>
+                          </div>
                         </div>
+                        <span className="play-tag explore-tag">View Profile ➔</span>
                       </div>
-                      <span className="play-tag">{t("playTag")}</span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-search-state">
+                    <p>No artists matched "{searchTerm}"</p>
+                  </div>
+                )
               ) : (
-                <div className="empty-search-state">
-                  <p>{t("noLocalTracksMatch")} "{searchTerm}"</p>
-                  <button
-                    type="button"
-                    onClick={() => handleGlobalSearchNavigate()}
-                    className="global-search-btn"
-                  >
-                    {t("searchGlobalDb")}
-                  </button>
-                </div>
+                filteredSongs.length > 0 || (activeCategoryTab === 'all' && matchedArtists.length > 0) ? (
+                  <div className="song-results-list">
+                    {activeCategoryTab === 'all' && matchedArtists.slice(0, 3).map((artist) => (
+                      <div
+                        key={`matched-art-${artist.id}`}
+                        onClick={() => handleArtistClick(artist.name)}
+                        className="song-result-item"
+                      >
+                        <div className="song-meta">
+                          <img
+                            src={artist.image}
+                            alt={artist.name}
+                            className="artist-avatar"
+                          />
+                          <div className="song-meta-text">
+                            <h4 className="song-title">{formatTitleCase(artist.name)}</h4>
+                            <p className="song-subtitle">{t("artists") || "Artist"}</p>
+                          </div>
+                        </div>
+                        <span className="play-tag explore-tag">Explore ➔</span>
+                      </div>
+                    ))}
+
+                    {filteredSongs.map((song) => (
+                      <div
+                        key={song._id || song.id}
+                        onClick={() => {
+                          setIsFocused(false);
+                          triggerPlay(song);
+                        }}
+                        className="song-result-item"
+                      >
+                        <div className="song-meta">
+                          <img
+                            src={song.image || song.coverUrl || song.img}
+                            alt={song.title}
+                            className="song-cover"
+                          />
+                          <div className="song-meta-text">
+                            <h4 className="song-title">{song.title}</h4>
+                            <p className="song-subtitle">{t("songLabel")} • {song.artist}</p>
+                          </div>
+                        </div>
+                        <span className="play-tag">{t("playTag")}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-search-state">
+                    <p>{t("noLocalTracksMatch")} "{searchTerm}"</p>
+                    <button
+                      type="button"
+                      onClick={() => handleGlobalSearchNavigate()}
+                      className="global-search-btn"
+                    >
+                      {t("searchGlobalDb")}
+                    </button>
+                  </div>
+                )
               )}
             </div>
           )}

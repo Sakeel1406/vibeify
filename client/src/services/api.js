@@ -41,14 +41,12 @@ export const getMe = () => api.get("/auth/me");
 
 // ---- Users ----
 export const getUserProfile = () => api.get("/users/profile");
-export const updateProfile = (data) => api.put("/users/profile", data); //  Added updateProfile API export
+export const updateProfile = (data) => api.put("/users/profile", data);
 
 // ---- Songs ----
 export const getSongs = (search = "") =>
   api.get(`/songs${search ? `?search=${encodeURIComponent(search)}` : ""}`);
-
 export const fetchSongs = () => api.get("/songs");
-
 export const getTopSongs = () => api.get("/songs/top");
 export const getSongById = (id) => api.get(`/songs/${id}`);
 export const uploadSong = (formData) =>
@@ -62,7 +60,15 @@ export const getLikedSongs = () => api.get("/songs/liked/me");
 // ---- Stream Limit Tracking & History API ----
 export const recordPlay = (id) => api.post(`/songs/${id}/play`);
 export const getRecentlyPlayed = () => api.get("/songs/recent/me");
-export const clearRecentlyPlayed = () => api.delete("/songs/recent/me"); // 👈 ADDED THIS
+export const clearRecentlyPlayed = () => api.delete("/songs/recent/me");
+
+// ---- Artists ----
+export const getArtists = () => api.get("/artists");
+export const addArtist = (formData) =>
+  api.post("/artists", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const deleteArtist = (id) => api.delete(`/artists/${id}`);
 
 // ---- Playlists ----
 export const getPlaylists = () => api.get("/playlists");

@@ -17,6 +17,7 @@ export function PlayerProvider({ children }) {
 
   const [songs, setSongs] = useState([]);
   const [queue, setQueue] = useState([]);
+  const [playbackContext, setPlaybackContext] = useState(null);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
@@ -24,6 +25,7 @@ export function PlayerProvider({ children }) {
   const [repeat, setRepeat] = useState(false);
 
   const audioRef = useRef(new Audio());
+  const playPromiseRef = useRef(null);
 
   const [guestPlayCount, setGuestPlayCount] = useState(() => {
     return Number(localStorage.getItem("vibeify_guest_play_count")) || 0;
@@ -47,19 +49,7 @@ export function PlayerProvider({ children }) {
     }
   }, [volume]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    const handleError = () => {
-      console.error("Audio Playback Error:", audio.error?.message);
-      if (showToast) {
-        showToast("Failed to load audio stream format", "error");
-      }
-    };
-    audio.addEventListener("error", handleError);
-    return () => audio.removeEventListener("error", handleError);
-  }, [showToast]);
-
-  // Robust Audio Listeners with duration fallback handling
+  // Audio Listeners with auto-advance and duration calculation
   useEffect(() => {
     const audio = audioRef.current;
 
@@ -79,6 +69,11 @@ export function PlayerProvider({ children }) {
       }
     };
     const handleEnded = () => {
+      if (repeat) {
+        audio.currentTime = 0;
+        safePlay();
+        return;
+      }
       if (!user && guestPlayCount >= MAX_GUEST_PLAYS) {
         setIsPlaying(false);
         setShowLimitModal(true);
@@ -90,60 +85,94 @@ export function PlayerProvider({ children }) {
       nextSong();
     };
 
+    const handleError = () => {
+      if (audio.error && audio.error.code !== 20) {
+        console.warn("Audio stream load note:", audio.error?.message);
+      }
+    };
+
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("durationchange", handleDurationChange);
     audio.addEventListener("ended", handleEnded);
-
-    if (audio.duration && !isNaN(audio.duration) && audio.duration !== Infinity) {
-      setDuration(audio.duration);
-    } else if (currentSong?.duration) {
-      setDuration(currentSong.duration);
-    }
+    audio.addEventListener("error", handleError);
 
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("durationchange", handleDurationChange);
       audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
     };
-  }, [user, guestPlayCount, showToast, queue, currentSong]);
+  }, [user, guestPlayCount, showToast, queue, currentSong, repeat, shuffle]);
 
-  // Audio URL Resolution and Playback Control with Debugging
+  // Safe Async Playback Helpers
+  const safePlay = () => {
+    const audio = audioRef.current;
+    if (!audio || !audio.src) return;
+
+    playPromiseRef.current = audio.play();
+    if (playPromiseRef.current !== undefined) {
+      playPromiseRef.current
+        .then(() => {
+          playPromiseRef.current = null;
+        })
+        .catch((err) => {
+          playPromiseRef.current = null;
+          // Ignore natural user abort/interruption calls
+          if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
+            console.error("Audio playback error:", err);
+          }
+        });
+    }
+  };
+
+  const safePause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (playPromiseRef.current) {
+      playPromiseRef.current
+        .then(() => {
+          audio.pause();
+        })
+        .catch(() => {
+          audio.pause();
+        });
+    } else {
+      audio.pause();
+    }
+  };
+
+  // Synchronize Audio Source & State
   useEffect(() => {
     const audio = audioRef.current;
 
     if (currentSong) {
-      console.log("🎵 Current Song Object:", currentSong);
-
-      let rawUrl = 
-        currentSong?.songUrl || 
-        currentSong?.audio || 
-        currentSong?.url || 
-        currentSong?.audioUrl || 
-        currentSong?.fileUrl || 
-        currentSong?.filePath || 
-        currentSong?.path || 
-        currentSong?.song || 
+      const rawUrl =
+        currentSong?.songUrl ||
+        currentSong?.audio ||
+        currentSong?.url ||
+        currentSong?.audioUrl ||
+        currentSong?.fileUrl ||
+        currentSong?.filePath ||
+        currentSong?.path ||
+        currentSong?.song ||
         currentSong?.file;
-
-      console.log("🔗 Resolved Raw URL:", rawUrl);
 
       if (rawUrl) {
         let finalSongUrl = rawUrl;
-        
+
         if (rawUrl.startsWith("/") || (!rawUrl.startsWith("http://") && !rawUrl.startsWith("https://"))) {
           const backendBase = import.meta.env.VITE_API_URL || "http://localhost:5000";
-          const baseHost = backendBase.replace(/\/api\/?$/, ""); 
-          
+          const baseHost = backendBase.replace(/\/api\/?$/, "");
+
           if (rawUrl.startsWith("/")) {
-             finalSongUrl = `${baseHost}${rawUrl}`;
+            finalSongUrl = `${baseHost}${rawUrl}`;
           } else {
-             finalSongUrl = `${baseHost}/${rawUrl}`;
+            finalSongUrl = `${baseHost}/${rawUrl}`;
           }
         }
-
-        console.log("🚀 Final Audio SRC:", finalSongUrl);
 
         if (audio.src !== finalSongUrl) {
           audio.src = finalSongUrl;
@@ -151,20 +180,15 @@ export function PlayerProvider({ children }) {
         }
 
         if (isPlaying) {
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-             playPromise.catch((err) => {
-                console.error("Audio playback failed:", err);
-             });
-          }
+          safePlay();
         } else {
-          audio.pause();
+          safePause();
         }
       } else {
         console.warn("⚠️ No audio URL found inside currentSong!");
       }
     } else {
-      audio.pause();
+      safePause();
     }
   }, [currentSong, isPlaying]);
 
@@ -197,7 +221,7 @@ export function PlayerProvider({ children }) {
       nextIndex = (currentIndex + 1) % activeQueue.length;
     }
 
-    playSong(activeQueue[nextIndex]);
+    playSong(activeQueue[nextIndex], activeQueue, playbackContext);
   };
 
   const prevSong = () => {
@@ -207,10 +231,10 @@ export function PlayerProvider({ children }) {
     const currentIndex = activeQueue.findIndex((s) => s._id === currentSong?._id);
     const prevIndex = (currentIndex - 1 + activeQueue.length) % activeQueue.length;
 
-    playSong(activeQueue[prevIndex]);
+    playSong(activeQueue[prevIndex], activeQueue, playbackContext);
   };
 
-  const playSong = (song, newQueue = []) => {
+  const playSong = (song, newQueue = [], context = null) => {
     if (!song) return false;
 
     if (!user && guestPlayCount >= MAX_GUEST_PLAYS) {
@@ -226,8 +250,12 @@ export function PlayerProvider({ children }) {
       setGuestPlayCount((prev) => prev + 1);
     }
 
-    if (newQueue.length > 0) {
+    if (newQueue && newQueue.length > 0) {
       setQueue(newQueue);
+    }
+
+    if (context) {
+      setPlaybackContext(context);
     }
 
     setCurrentSong(song);
@@ -255,6 +283,8 @@ export function PlayerProvider({ children }) {
         setCurrentSong,
         isPlaying,
         setIsPlaying,
+        playbackContext,
+        setPlaybackContext,
         playSong,
         songs,
         setSongs,
@@ -283,7 +313,7 @@ export function PlayerProvider({ children }) {
   );
 }
 
-// Unified Aliases so both usePlayer and useMusic work seamlessly anywhere
 export const usePlayer = () => useContext(PlayerContext);
 export const useMusic = usePlayer;
 export const MusicProvider = PlayerProvider;
+export default PlayerContext;

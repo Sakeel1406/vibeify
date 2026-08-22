@@ -82,6 +82,8 @@ const translations = {
     search: "Search",
     library: "Your Library",
     topSongs: "Top Songs",
+    topArtists: "Top Artists",
+    albums: "Albums",
     createPlaylist: "Create Playlist",
     likedSongs: "Liked Songs",
     adminDashboard: "Admin Dashboard",
@@ -112,6 +114,8 @@ const translations = {
     filterMalayalam: "Malayalam",
     filterHindi: "Hindi",
     filterTelugu: "Telugu",
+    filterKannada: "Kannada",
+    filterOther: "Other",
 
     // --- VIBEIFY AESTHETIC TEXT ---
     featuredTrack: "spotlight vibez",
@@ -121,6 +125,8 @@ const translations = {
     trendzHits: "TRENDZ HITS",
     queueVibez: "Queue Vibez",
     tracks: "tracks",
+    seeAll: "See All",
+    exploreTag: "Explore ➔",
 
     // ---------------- TOP SONGS PAGE ----------------
     streamVibezz: "STREAM VIBEZZ SONGS",
@@ -149,7 +155,6 @@ const translations = {
     all: "All",
     songsTab: "Songs",
     artists: "Artists",
-    albums: "Albums",
     topResult: "Top Result",
     songLabel: "SONG",
     noAlbumsMatched: "No albums matched your search.",
@@ -175,14 +180,16 @@ const translations = {
     playlists: "Playlists",
     song: "song",
     songs: "songs",
+    following: "Following",
+    unfollow: "Unfollow",
     publicPlaylist: "PUBLIC PLAYLIST",
     privatePlaylist: "PRIVATE PLAYLIST",
     vibeifyOfficial: "Vibeify Official",
     emptyPlaylist: "This playlist is empty. Click the (+) button above to add songs.",
     playingFromAlbum: "PLAYING FROM ALBUM",
     deletePlaylistConfirm: "Delete playlist",
-    deletedPlaylistToast: "deleted 🗑️",
-    failedDeletePlaylist: "Failed to delete playlist. Please try again!",
+    deletedPlaylistToast: "deleted successfully",
+    failedDeletePlaylist: "Failed to delete playlist",
     playlistEmptyToast: "is empty!",
     playingPlaylistToast: "Playing",
     loadingCollection: "Loading your collection...",
@@ -194,8 +201,34 @@ const translations = {
     noLikedSongsYet: "No Liked Songs Yet",
     tapHeartToSave: "Tap the heart icon on any song to save it to your collection.",
     exploreSongs: "Explore Songs",
-    
-    // ---------------- MODALS & SEARCH ----------------
+    noFollowedArtistsYet: "No Followed Artists",
+    followedArtistsPromo: "Follow top creators, composers, and singers to quickly access their profiles and releases.",
+    exploreArtists: "Explore Artists",
+    playAll: "Play All",
+
+    // ---------------- TOAST NOTIFICATIONS ----------------
+    followingArtist: "Following",
+    unfollowedArtist: "Unfollowed",
+    artistLinkCopied: "Artist link copied to clipboard! 🔗",
+    playlistCreatedToast: "Playlist created! 📂",
+    failedCreatePlaylist: "Failed to create playlist",
+
+    // ---------------- ARTIST DETAILS & ARTISTS PAGE ----------------
+    backToArtists: "Back to Artists",
+    monthlyListeners: "monthly listeners",
+    tracksOnVibeify: "tracks on Vibeify",
+    popularSongs: "Popular Songs",
+    artistsSubtitle: "Explore chart-topping creators and music icons",
+    searchArtistsPlaceholder: "Search artists...",
+    loadingTopArtists: "Loading Top Artists...",
+    trendingArtist: "Trending Artist",
+    noArtistsFound: "No artists found matching",
+
+    // ---------------- ADMIN - ARTIST PHOTO UPLOAD ----------------
+    artistPhotoForm: "Artist Photo (optional)",
+    chooseArtistPhoto: "Choose artist photo...",
+
+    // ---------------- MODALS & POPUPS ----------------
     createPlaylistModal: "CREATE PLAYLIST",
     newCyberPlaylist: "New Cyber Playlist",
     configPlaylist: "Configure track vibes and privacy controls",
@@ -216,9 +249,6 @@ const translations = {
     titleLabel: "Title",
     enterTitlePlaceholder: "Enter title (e.g. Cyberpunk Nights)",
     privacySettingLabel: "Privacy Setting",
-    playlistCreatedToast: "created!",
-
-    // Custom Modals Translation Keys
     clearHistoryTitle: "Clear History?",
     clearHistoryDesc: "Are you sure you want to clear your recently played tracks? This action cannot be undone.",
     clearHistoryBtn: "Clear History",
@@ -361,7 +391,7 @@ const translations = {
     singleRelease: "Single",
     totalDurationLabel: "Total Duration",
     upNextInQueue: "Up Next in Queue",
-    
+
     // ---------------- PLAYLIST DETAILS PAGE ----------------
     loadingPlaylist: "Loading playlist...",
     failedLoadPlaylist: "Failed to load playlist details!",
@@ -401,7 +431,7 @@ const translations = {
     sidebarClosed: "Sidebar closed",
     vibeifyAudioApp: "Vibeify Audio Application",
     closeNotification: "Close notification",
-    
+
     // ---------------- SONG CARD ----------------
     trackArtAlt: "Track art",
     pauseSongAria: "Pause song",
@@ -422,7 +452,7 @@ const translations = {
     playPauseAria: "Play or Pause",
     previousTrackAria: "Previous track",
     nextTrackAria: "Next track",
-    toggleMuteAria: "Toggle mute"
+    toggleMuteAria: "Toggle mute",
   },
 
   ta: {
@@ -503,6 +533,8 @@ const translations = {
     search: "தேடல்",
     library: "உங்கள் நூலகம்",
     topSongs: "சிறந்த பாடல்கள்",
+    topArtists: "சிறந்த கலைஞர்கள்",
+    albums: "ஆல்பங்கள்",
     createPlaylist: "பிளேலிஸ்ட்டை உருவாக்கு",
     likedSongs: "விருப்பமான பாடல்கள்",
     adminDashboard: "நிர்வாகக் குழு",
@@ -533,6 +565,8 @@ const translations = {
     filterMalayalam: "மலையாளம்",
     filterHindi: "இந்தி",
     filterTelugu: "தெலுங்கு",
+    filterKannada: "கன்னடம்",
+    filterOther: "மற்றும் பல",
 
     // --- VIBEIFY AESTHETIC TEXT ---
     featuredTrack: "ஸ்பாட்லைட் வைப்ஸ்",
@@ -542,6 +576,8 @@ const translations = {
     trendzHits: "ட்ரெண்ட்ஸ் ஹிட்ஸ்",
     queueVibez: "க்யூ வைப்ஸ்",
     tracks: "பாடல்கள்",
+    seeAll: "அனைத்தையும் காண்க",
+    exploreTag: "ஆராய்க ➔",
 
     // ---------------- TOP SONGS PAGE ----------------
     streamVibezz: "வைப்ஸ் பாடல்களை ஸ்ட்ரீம் செய்",
@@ -570,7 +606,6 @@ const translations = {
     all: "அனைத்தும்",
     songsTab: "பாடல்கள்",
     artists: "கலைஞர்கள்",
-    albums: "ஆல்பங்கள்",
     topResult: "சிறந்த முடிவு",
     songLabel: "பாடல்",
     noAlbumsMatched: "உங்கள் தேடலுக்குப் பொருந்தக்கூடிய ஆல்பங்கள் எதுவும் இல்லை.",
@@ -592,18 +627,20 @@ const translations = {
     searchingFor: "தேடுகிறது",
 
     // ---------------- LIBRARY & PLAYLISTS ----------------
-    manageEcosystem: "உங்கள் தனிப்பட்ட ஆடியோ சூழல் அமைப்பை நிர்வகிக்கவும்",
+    manageEcosystem: "உங்கள் பிளேலிஸ்ட்கள், சேமிக்கப்பட்ட பாடல்கள் மற்றும் கலைஞர்களை நிர்வகிக்கவும்",
     playlists: "பிளேலிஸ்ட்கள்",
     song: "பாடல்",
     songs: "பாடல்கள்",
+    following: "பின்தொடர்கிறீர்கள்",
+    unfollow: "பின்தொடர்வதை நிறுத்து",
     publicPlaylist: "பொது பிளேலிஸ்ட்",
     privatePlaylist: "தனிப்பட்ட பிளேலிஸ்ட்",
     vibeifyOfficial: "வைபிஃபை அதிகாரப்பூர்வ",
     emptyPlaylist: "இந்த பிளேலிஸ்ட் காலியாக உள்ளது. பாடல்களைச் சேர்க்க, மேலே உள்ள (+) பொத்தானைக் கிளிக் செய்யவும்.",
     playingFromAlbum: "ஆல்பத்திலிருந்து ஒலிக்கிறது",
     deletePlaylistConfirm: "பிளேலிஸ்ட்டை நீக்கவா:",
-    deletedPlaylistToast: "நீக்கப்பட்டது 🗑️",
-    failedDeletePlaylist: "பிளேலிஸ்ட்டை நீக்குவதில் தோல்வி. மீண்டும் முயற்சிக்கவும்!",
+    deletedPlaylistToast: "வெற்றிகரமாக நீக்கப்பட்டது",
+    failedDeletePlaylist: "பிளேலிஸ்ட்டை நீக்குவதில் தோல்வி",
     playlistEmptyToast: "காலியாக உள்ளது!",
     playingPlaylistToast: "ஒலிக்கிறது",
     loadingCollection: "உங்கள் தொகுப்பை ஏற்றுகிறது...",
@@ -615,8 +652,34 @@ const translations = {
     noLikedSongsYet: "விருப்பமான பாடல்கள் எதுவும் இல்லை",
     tapHeartToSave: "உங்கள் தொகுப்பில் சேமிக்க எந்தப் பாடலிலும் உள்ள இதய ஐகானைத் தட்டவும்.",
     exploreSongs: "பாடல்களை ஆராயுங்கள்",
-    
-    // ---------------- MODALS & SEARCH ----------------
+    noFollowedArtistsYet: "பின்தொடரும் கலைஞர்கள் யாரும் இல்லை",
+    followedArtistsPromo: "கலைஞர்களின் வெளியீடுகளை உடனடியாக அணுக அவர்களைப் பின்தொடரவும்.",
+    exploreArtists: "கலைஞர்களை ஆராயுங்கள்",
+    playAll: "அனைத்தையும் இயக்கு",
+
+    // ---------------- TOAST NOTIFICATIONS ----------------
+    followingArtist: "பின்தொடர்கிறீர்கள்",
+    unfollowedArtist: "பின்தொடர்வதை நிறுத்தினீர்கள்",
+    artistLinkCopied: "கலைஞர் இணைப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது! 🔗",
+    playlistCreatedToast: "பிளேலிஸ்ட் உருவாக்கப்பட்டது! 📂",
+    failedCreatePlaylist: "பிளேலிஸ்ட்டை உருவாக்குவதில் தோல்வி",
+
+    // ---------------- ARTIST DETAILS & ARTISTS PAGE ----------------
+    backToArtists: "கலைஞர்களுக்குத் திரும்பு",
+    monthlyListeners: "மாதாந்திர கேட்போர்",
+    tracksOnVibeify: "பாடல்கள் வைபிஃபையில் உள்ளன",
+    popularSongs: "பிரபலமான பாடல்கள்",
+    artistsSubtitle: "தரவரிசையில் உள்ள படைப்பாளிகள் மற்றும் இசை ஐகான்களை ஆராயுங்கள்",
+    searchArtistsPlaceholder: "கலைஞர்களைத் தேடுக...",
+    loadingTopArtists: "சிறந்த கலைஞர்களை ஏற்றுகிறது...",
+    trendingArtist: "ட்ரெண்டிங் கலைஞர்",
+    noArtistsFound: "பொருத்தமான கலைஞர்கள் யாரும் கிடைக்கவில்லை",
+
+    // ---------------- ADMIN - ARTIST PHOTO UPLOAD ----------------
+    artistPhotoForm: "கலைஞர் புகைப்படம் (விருப்பத்திற்குரியது)",
+    chooseArtistPhoto: "கலைஞர் புகைப்படத்தைத் தேர்ந்தெடுக்கவும்...",
+
+    // ---------------- MODALS & POPUPS ----------------
     createPlaylistModal: "பிளேலிஸ்ட்டை உருவாக்கு",
     newCyberPlaylist: "புதிய சைபர் பிளேலிஸ்ட்",
     configPlaylist: "ட்ராக் வைப்ஸ் மற்றும் தனியுரிமை கட்டுப்பாடுகளை உள்ளமைக்கவும்",
@@ -635,11 +698,8 @@ const translations = {
     synthesizeSubtitle: "புதிய பாடல் தொகுப்பை உருவாக்கவும்",
     untitledPlaylist: "தலைப்பில்லாத பிளேலிஸ்ட்",
     titleLabel: "தலைப்பு",
-    enterTitlePlaceholder: "தலைப்பை உள்ளிடவும் (உதா. சைபர்பಂಕ್ இரவுகள்)",
+    enterTitlePlaceholder: "தலைப்பை உள்ளிடவும் (உதா. சைபர்பங்க் இரவுகள்)",
     privacySettingLabel: "தனியுரிமை அமைப்பு",
-    playlistCreatedToast: "உருவாக்கப்பட்டது!",
-
-    // Custom Modals Translation Keys
     clearHistoryTitle: "வரலாற்றை அழிக்கவா?",
     clearHistoryDesc: "நீங்கள் சமீபத்தில் கேட்ட பாடல்களின் வரலாற்றை அழிக்க விரும்புகிறீர்களா? இந்தச் செயலைத் தவிர்க்க முடியாது.",
     clearHistoryBtn: "வரலாற்றை அழி",
@@ -767,7 +827,7 @@ const translations = {
     shuffleDisabled: "கலைத்து இயக்குதல் முடக்கப்பட்டது",
     repeatEnabled: "மீண்டும் இயக்குதல் இயக்கப்பட்டது 🔁",
     repeatDisabled: "மீண்டும் இயக்குதல் முடக்கப்பட்டது",
-    addedTo: "இதில் சேர்க்கப்பட்டது",
+    addedTo: " இதில் சேர்க்கப்பட்டது",
     failedToAddTrack: "பாடலைச் சேர்ப்பதில் தோல்வி",
     audioMuted: "ஆடியோ முடக்கப்பட்டது 🔇",
     vibeifyStudioRelease: "வைபிஃபை ஸ்டுடியோ வெளியீடு",
@@ -822,7 +882,7 @@ const translations = {
     sidebarClosed: "பக்கப்பட்டி மூடப்பட்டது",
     vibeifyAudioApp: "வைபிஃபை ஆடியோ பயன்பாடு",
     closeNotification: "அறிவிப்பை மூடு",
-    
+
     // ---------------- SONG CARD ----------------
     trackArtAlt: "பாடல் அட்டைப்படம்",
     pauseSongAria: "பாடலை இடைநிறுத்து",
@@ -843,8 +903,8 @@ const translations = {
     playPauseAria: "இயக்கு அல்லது இடைநிறுத்து",
     previousTrackAria: "முந்தைய பாடல்",
     nextTrackAria: "அடுத்த பாடல்",
-    toggleMuteAria: "ஒலியடக்குதலை மாற்று"
-  }
+    toggleMuteAria: "ஒலியடக்குதலை மாற்று",
+  },
 };
 
 export const SettingsProvider = ({ children }) => {
@@ -889,13 +949,13 @@ export const SettingsProvider = ({ children }) => {
       emerald: { primary: "#10b981", secondary: "#06b6d4", glow: "rgba(6, 182, 212, 0.35)" },
       gold: { primary: "#f59e0b", secondary: "#ef4444", glow: "rgba(239, 68, 68, 0.35)" },
     };
-    
+
     const activeTheme = themeAccents[theme] || themeAccents.violet;
     root.style.setProperty("--accent-primary", activeTheme.primary);
     root.style.setProperty("--accent-secondary", activeTheme.secondary);
     root.style.setProperty("--accent-glow", activeTheme.glow);
     root.style.setProperty("--accent-gradient", `linear-gradient(135deg, ${activeTheme.primary}, ${activeTheme.secondary})`);
-    
+
     document.body.className = `theme-${theme}`;
   }, [theme, glassIntensity]);
 
@@ -917,10 +977,18 @@ export const SettingsProvider = ({ children }) => {
     } else {
       document.body.classList.remove("compact-sidebar-enabled");
     }
-
   }, [
-    compactSidebar, explicitBadges, audioQuality, eqPreset, crossfade, 
-    normalizeVolume, spatialAudio, autoPlay, dataSaver, privateSession, showActivity
+    compactSidebar,
+    explicitBadges,
+    audioQuality,
+    eqPreset,
+    crossfade,
+    normalizeVolume,
+    spatialAudio,
+    autoPlay,
+    dataSaver,
+    privateSession,
+    showActivity,
   ]);
 
   const t = (key) => {
@@ -928,23 +996,39 @@ export const SettingsProvider = ({ children }) => {
   };
 
   return (
-    <SettingsContext.Provider value={{ 
-      language, setLanguage, 
-      theme, setTheme, 
-      glassIntensity, setGlassIntensity, 
-      compactSidebar, setCompactSidebar,
-      explicitBadges, setExplicitBadges,
-      audioQuality, setAudioQuality,
-      eqPreset, setEqPreset,
-      crossfade, setCrossfade,
-      normalizeVolume, setNormalizeVolume,
-      spatialAudio, setSpatialAudio,
-      autoPlay, setAutoPlay,
-      dataSaver, setDataSaver,
-      privateSession, setPrivateSession,
-      showActivity, setShowActivity,
-      t 
-    }}>
+    <SettingsContext.Provider
+      value={{
+        language,
+        setLanguage,
+        theme,
+        setTheme,
+        glassIntensity,
+        setGlassIntensity,
+        compactSidebar,
+        setCompactSidebar,
+        explicitBadges,
+        setExplicitBadges,
+        audioQuality,
+        setAudioQuality,
+        eqPreset,
+        setEqPreset,
+        crossfade,
+        setCrossfade,
+        normalizeVolume,
+        setNormalizeVolume,
+        spatialAudio,
+        setSpatialAudio,
+        autoPlay,
+        setAutoPlay,
+        dataSaver,
+        setDataSaver,
+        privateSession,
+        setPrivateSession,
+        showActivity,
+        setShowActivity,
+        t,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );

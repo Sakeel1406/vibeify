@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 // Context Providers
 import { AuthProvider } from "./context/AuthContext";
-import { SettingsProvider } from "./context/SettingsContext"; // Imported SettingsProvider
+import { SettingsProvider } from "./context/SettingsContext";
 import { PlayerProvider } from "./context/PlayerContext";
 import { ToastProvider } from "./context/ToastContext";
 
@@ -28,13 +28,15 @@ import Settings from "./pages/Settings/Settings";
 import TopSongs from "./pages/TopSongs/TopSongs";
 import Albums from "./pages/Albums/Albums";
 import AlbumDetails from "./pages/AlbumDetails/AlbumDetails";
+import Artists from "./pages/Artists/Artists";
+import ArtistDetails from "./pages/Artists/ArtistDetails";
 
 import "./App.css";
 
 function App() {
   return (
     <AuthProvider>
-      <SettingsProvider> {/* Wrapped around the rest of the app */}
+      <SettingsProvider>
         <ToastProvider>
           <PlayerProvider>
             <StreamingLimitModal />
@@ -49,6 +51,8 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/top-songs" element={<TopSongs />} />
+                <Route path="/artists" element={<Artists />} />
+                <Route path="/artist/:name" element={<ArtistDetails />} />
                 <Route path="/albums" element={<Albums />} />
                 <Route path="/album/:name" element={<AlbumDetails />} />
                 <Route path="/now-playing" element={<NowPlaying />} />

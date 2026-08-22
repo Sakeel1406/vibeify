@@ -19,7 +19,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  
+
   const { t, theme } = useSettings();
 
   const [playlists, setPlaylists] = useState([]);
@@ -194,20 +194,49 @@ const Sidebar = ({ isOpen, onClose }) => {
               <span>{t("topSongs")}</span>
             </NavLink>
 
+            {/* TOP ARTISTS LINK WITH TRANSLATION */}
+            <NavLink to="/artists" onClick={handleNavClick} className="nav-item">
+              <svg
+                className="nav-icon text-amber-400"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+                style={{ flexShrink: 0 }}
+              >
+                <rect x="9" y="2" width="6" height="11" rx="3" fill="currentColor" />
+                <path
+                  d="M5 10a7 7 0 0 0 14 0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M12 17v4m-4 0h8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span>{t("topArtists")}</span>
+            </NavLink>
+
             <NavLink to="/albums" onClick={handleNavClick} className="nav-item">
               <svg 
                 className="nav-icon text-purple-400" 
                 viewBox="0 0 24 24" 
                 width="20" 
                 height="20" 
-                fill="currentColor"
+                fill="currentColor" 
                 style={{ flexShrink: 0 }}
               >
                 <circle cx="9" cy="13" r="7.5" fill="currentColor" opacity="0.25"/>
                 <circle cx="9" cy="13" r="7.5" fill="none" stroke="currentColor" strokeWidth="1.3"/>
                 <circle cx="9" cy="13" r="3.5" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="1 1"/>
                 <circle cx="9" cy="13" r="1.5" fill="currentColor"/>
-                <path d="M19 4v7.25c-.34-.15-.72-.25-1.12-.25-1.59 0-2.88 1.29-2.88 2.88s1.29 2.88 2.88 2.88 2.88-1.29 2.88-2.88V7h3V4h-4.76z" fill="currentColor"/>
+                <path d="M19 4v7.25c-.34-.15-.72-.25-1.12-.25-1.59 0-2.88 1.29-2.88 2.88s1.29 2.88 2.88 2.88s1.29-2.88 2.88-2.88V7h3V4h-4.76z" fill="currentColor"/>
               </svg>
               <span>{t("albums")}</span>
             </NavLink>
@@ -218,7 +247,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 viewBox="0 0 24 24" 
                 width="20" 
                 height="20" 
-                fill="currentColor"
+                fill="currentColor" 
                 style={{ flexShrink: 0 }}
               >
                 <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z" fill="currentColor" opacity="0.3" />
@@ -270,14 +299,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 viewBox="0 0 24 24" 
                 width="20" 
                 height="20" 
-                fill="none"
+                fill="none" 
                 style={{ flexShrink: 0, display: "block" }}
               >
                 <path 
                   d="M4.5 13 V10 A7.5 7.5 0 0 1 19.5 10 V13" 
                   stroke="currentColor" 
                   strokeWidth="1.8" 
-                  strokeLinecap="round"
+                  strokeLinecap="round" 
                 />
                 <rect x="2" y="11" width="3.5" height="7" rx="1.5" fill="currentColor" />
                 <rect x="18.5" y="11" width="3.5" height="7" rx="1.5" fill="currentColor" />
@@ -293,7 +322,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           <div className="divider" role="separator" />
 
           <div className="playlist-list">
-            {/* YOUR PLAYLISTS Header with Custom SVG Playlist Icon */}
             <div className="your-playlists-header">
               <svg 
                 viewBox="0 0 24 24" 
@@ -329,7 +357,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
       </aside>
 
-      {/* Modal remains unchanged */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div
@@ -346,6 +374,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <button
                 className="modal-close-btn"
                 onClick={handleCloseModal}
+                aria-label="Close modal"
                 type="button"
               >
                 <FaTimes />
